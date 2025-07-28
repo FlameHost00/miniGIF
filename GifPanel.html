@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIF Панель</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      color: white;
+      overflow: hidden;
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Космический фон */
+    .space-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+      overflow: hidden;
+    }
+
+    /* Светящиеся линии */
+    .glowing-line {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      transform-origin: left center;
+      animation: moveLine linear infinite;
+    }
+
+    @keyframes moveLine {
+      0% {
+        transform: translateX(-100%) rotate(0deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      90% {
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translateX(100vw) rotate(0deg);
+        opacity: 0;
+      }
+    }
+
+    /* Звезды */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--duration) ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+
+    /* Остальные стили панели */
+    #panelCategories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 5px;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(3px);
+      flex-shrink: 0;
+    }
+
+    .panel-category-btn {
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      transition: transform 0.1s, opacity 0.2s;
+      box-sizing: border-box;
+    }
+
+    .panel-category-btn.selected {
+      border: 2px solid white;
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    }
+
+    .panel-category-btn.dragging {
+      opacity: 0.8;
+      transform: scale(1.05);
+      z-index: 10;
+    }
+
+    #panelItemsContainer {
+      flex-grow: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    #panelItemsGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 5px;
+      padding: 5px;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-gif-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      padding: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s;
+    }
+
+    .panel-gif-item:hover {
+      transform: scale(1.05);
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .panel-gif-item img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 3px;
+    }
+
+    .panel-gif-code {
+      font-size: 10px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .copy-notification {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      z-index: 100;
+      animation: fadeInOut 1.5s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+      }
+
+      20% {
+        opacity: 1;
+      }
+
+      80% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* Улучшенный кастомный скролл для GIF панели */
+    /* Улучшенный кастомный скролл для GIF панели */
+    #panelItemsContainer {
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary, #4361ee) rgba(0, 0, 0, 0.3);
+      scroll-behavior: smooth;
+      overflow-y: auto;
+      min-height: 0;
+      flex-grow: 1;
+    }
+
+    #panelItemsContainer::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    #panelItemsContainer::-webkit-scrollbar-track {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      margin: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #panelItemsContainer::-webkit-scrollbar-thumb {
+      background-color: var(--primary, #4361ee);
+      border-radius: 5px;
+      border: 2px solid rgba(57, 82, 195, 0.5);
+      background-clip: padding-box;
+    }
+
+    #panelItemsContainer::-webkit-scrollbar-thumb:hover {
+      background-color: var(--secondary, #3a56d4);
+      border-color: rgba(57, 82, 195, 0.8);
+    }
+
+    #panelItemsContainer::-webkit-scrollbar-corner {
+      background-color: transparent;
+    }
+
+    /* Для Firefox */
+    @supports (scrollbar-color: auto) {
+      #panelItemsContainer {
+        scrollbar-color: var(--primary, #4361ee) rgba(0, 0, 0, 0.3);
+        scrollbar-width: thin;
+      }
+    }
+
+    /* Кастом рамка */
+    .custom-title-bar {
+      -webkit-app-region: drag;
+      height: 30px;
+      background-color: #2d2d2d;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .title {
+      font-size: 14px;
+      margin-left: 8px;
+    }
+
+    .window-controls {
+      -webkit-app-region: no-drag;
+      display: flex;
+      height: 100%;
+    }
+
+    .window-controls button {
+      background: none;
+      border: none;
+      color: white;
+      width: 46px;
+      height: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .window-controls button:hover {
+      background-color: #3d3d3d;
+    }
+
+    .window-controls #close-btn:hover {
+      background-color: #e81123;
+    }
+
+    /* Стили для кнопки закрепить */
+    .window-controls .pin-btn {
+      width: 40px;
+      margin-right: 5px;
+    }
+
+    .window-controls .pin-btn.active {
+      color: #4361ee;
+      background-color: white;
+    }
+
+    /* Сдвигаем основной контент вниз */
+    body {
+      padding-top: 30px;
+    }
+
+    /* Стиль хоткей */
+    /* Стили для кнопки настроек */
+    .window-controls .settings-btn {
+      background: none;
+      border: none;
+      color: white;
+      width: 40px;
+      height: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .window-controls .settings-btn:hover {
+      background-color: #3d3d3d;
+    }
+
+    /* Стили для модального окна */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      background-color: #2d2d2d;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 350px;
+      max-width: 90%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .close-modal {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-modal:hover {
+      color: white;
+    }
+
+    .hotkey-settings {
+      margin-top: 20px;
+    }
+
+    .hotkey-settings button {
+      background-color: #4361ee;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .hotkey-settings button:hover {
+      background-color: #3a56d4;
+    }
+
+    #hotkeyInput {
+      background: #333;
+      color: white;
+      border: 1px solid #555;
+      padding: 8px;
+      border-radius: 4px;
+      width: 100%;
+      margin: 10px 0;
+      text-align: center;
+    }
+
+    /* Стили для отображения текущей горячей клавиши */
+    .current-hotkey {
+      display: inline-block;
+      padding: 6px 12px;
+      margin: 10px 0;
+      background-color: rgba(67, 97, 238, 0.2);
+      border: 1px solid #4361ee;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 0 5px rgba(67, 97, 238, 0.5);
+    }
+
+    /* Обновите стили для контейнера горячей клавиши */
+    .hotkey-settings p {
+      margin: 15px 0 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Кастомный заголовок окна -->
+  <div class="custom-title-bar">
+    <div class="title">GIF Панель</div>
+    <div class="window-controls">
+      <button class="pin-btn" id="pinPanelBtn" title="Поверх окон">📌</button>
+      <button class="settings-btn" id="hotkeySettingsBtn" title="Настройки">⚙️</button>
+      <button id="minimize-btn">−</button>
+      <button id="maximize-btn">□</button>
+      <button id="close-btn">×</button>
+    </div>
+  </div>
+
+  <!-- Космический фон -->
+  <div class="space-background">
+    <div class="stars" id="stars"></div>
+  </div>
+
+  <!-- Остальная часть панели -->
+  <div id="panelCategories"></div>
+  <div id="panelItemsContainer">
+    <div id="panelItemsGrid"></div>
+  </div>
+
+  <!-- Добавьте модальное окно для настроек в конец body -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3>Настройки горячей клавиши</h3>
+      <div class="hotkey-settings">
+        <p>Текущая комбинация:</p>
+        <div id="currentHotkeyDisplay" class="current-hotkey"></div>
+        <button id="changeHotkeyBtn">Изменить горячую клавишу</button>
+        <div id="hotkeyInputContainer" style="display: none;">
+          <p>Нажмите новую комбинацию клавиш:</p>
+          <input type="text" id="hotkeyInput" readonly>
+          <button id="saveHotkeyBtn">Сохранить</button>
+          <button id="cancelHotkeyBtn">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Добавляем генерацию звезд и линий
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      const starsCount = 150;
+
+      for (let i = 0; i < starsCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+
+        const size = Math.random() * 2;
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const duration = 2 + Math.random() * 3 + 's';
+        const delay = Math.random() * 5 + 's';
+
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${x}%`;
+        star.style.top = `${y}%`;
+        star.style.setProperty('--duration', duration);
+        star.style.animationDelay = delay;
+
+        starsContainer.appendChild(star);
+      }
+    }
+
+    function createGlowingLines() {
+      const background = document.querySelector('.space-background');
+      const linesCount = 10;
+
+      for (let i = 0; i < linesCount; i++) {
+        const line = document.createElement('div');
+        line.className = 'glowing-line';
+
+        const width = 50 + Math.random() * 150;
+        const height = 1 + Math.random();
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const angle = -30 + Math.random() * 60;
+        const duration = 10 + Math.random() * 20 + 's';
+        const delay = Math.random() * 15 + 's';
+
+        line.style.width = `${width}px`;
+        line.style.height = `${height}px`;
+        line.style.left = `${x}%`;
+        line.style.top = `${y}%`;
+        line.style.transform = `rotate(${angle}deg)`;
+        line.style.animationDuration = duration;
+        line.style.animationDelay = delay;
+
+        background.appendChild(line);
+      }
+    }
+
+    // Инициализация при загрузке
+    window.onload = function () {
+      createStars();
+      createGlowingLines();
+
+      // Остальной код инициализации панели...
+      const { ipcRenderer } = require('electron');
+
+      let categories = [];
+      let itemsData = {};
+      let currentCategory = null;
+      let dragStartIndex = null;
+
+      // ... (остальной JavaScript код панели остается без изменений)
+    };
+
+    // Остальной JavaScript код панели остается без изменений
+    const { ipcRenderer } = require('electron');
+
+    let categories = [];
+    let itemsData = {};
+    let currentCategory = null;
+    let dragStartIndex = null;
+
+    // Загрузка данных при старте
+    (async function init() {
+      const data = await ipcRenderer.invoke('load-initial-data');
+      categories = data.categories || [];
+      itemsData = data.itemsData || {};
+
+      // Загружаем сохраненный порядок категорий
+      const savedOrder = await ipcRenderer.invoke('load-categories-order');
+      if (savedOrder && savedOrder.length === categories.length) {
+        // Сортируем категории согласно сохраненному порядку
+        categories.sort((a, b) => {
+          return savedOrder.indexOf(a.id) - savedOrder.indexOf(b.id);
+        });
+      }
+
+      renderCategories();
+    })();
+
+    // Обработчик обновления данных
+    ipcRenderer.on('data-updated', async () => {
+      const data = await ipcRenderer.invoke('load-initial-data');
+      const newCategories = data.categories || [];
+      itemsData = data.itemsData || {};
+
+      // Сохраняем текущий порядок категорий при обновлении
+      const currentOrder = categories.map(cat => cat.id);
+      categories = newCategories;
+
+      // Восстанавливаем порядок
+      if (currentOrder.length === categories.length) {
+        categories.sort((a, b) => {
+          return currentOrder.indexOf(a.id) - currentOrder.indexOf(b.id);
+        });
+      }
+
+      renderCategories();
+    });
+
+
+    // Функция сохранения порядка категорий
+    async function saveCategoriesOrder() {
+      const order = categories.map(cat => cat.id);
+      await ipcRenderer.invoke('save-categories-order', order);
+    }
+
+    function renderCategories() {
+      const cont = document.getElementById('panelCategories');
+      cont.innerHTML = '';
+
+      categories.forEach((cat, index) => {
+        const b = document.createElement('button');
+        b.className = 'panel-category-btn';
+        b.style.backgroundColor = cat.color;
+        b.textContent = cat.name;
+        b.dataset.index = index;
+        b.dataset.id = cat.id;
+
+        if (cat.id === currentCategory) {
+          b.classList.add('selected');
+        }
+
+        b.onclick = () => {
+          document.querySelectorAll('.panel-category-btn').forEach(btn => {
+            btn.classList.remove('selected');
+          });
+          b.classList.add('selected');
+          currentCategory = cat.id;
+          renderItems();
+        };
+
+        b.draggable = true;
+        b.addEventListener('dragstart', handleDragStart);
+        b.addEventListener('dragover', handleDragOver);
+        b.addEventListener('drop', handleDrop);
+        b.addEventListener('dragend', handleDragEnd);
+
+        cont.appendChild(b);
+      });
+
+      if (categories.length > 0 && !currentCategory) {
+        currentCategory = categories[0].id;
+        renderItems();
+      }
+    }
+
+    function handleDragStart(e) {
+      dragStartIndex = +this.dataset.index;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', this.dataset.id);
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    async function handleDrop(e) {
+      e.preventDefault();
+      const dragEndIndex = +this.dataset.index;
+      if (dragStartIndex === dragEndIndex) return;
+
+      const [movedCategory] = categories.splice(dragStartIndex, 1);
+      categories.splice(dragEndIndex, 0, movedCategory);
+
+      // Сохраняем новый порядок
+      await saveCategoriesOrder();
+      renderCategories();
+    }
+
+    function handleDragEnd() {
+      this.classList.remove('dragging');
+    }
+
+    async function renderItems() {
+      const grid = document.getElementById('panelItemsGrid');
+      grid.innerHTML = '';
+      if (!currentCategory) return;
+      const items = itemsData[currentCategory] || [];
+
+      for (const item of items) {
+        const gifPath = await ipcRenderer.invoke('get-gif-path', item.gifId);
+        const div = document.createElement('div');
+        div.className = 'panel-gif-item';
+
+        div.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(item.code + ' ');
+            showCopyNotification(div);
+          } catch (err) {
+            console.error('Ошибка копирования:', err);
+          }
+        };
+
+        const img = document.createElement('img');
+        img.src = gifPath || '';
+        const code = document.createElement('div');
+        code.className = 'panel-gif-code';
+        code.textContent = item.code;
+        div.appendChild(img);
+        div.appendChild(code);
+        grid.appendChild(div);
+      }
+    }
+
+    function showCopyNotification(element) {
+      const notification = document.createElement('div');
+      notification.className = 'copy-notification';
+      notification.textContent = 'Скопировано!';
+      element.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 1500);
+    }
+
+    // Сохраняем порядок при закрытии окна
+    window.addEventListener('beforeunload', async () => {
+      await saveCategoriesOrder();
+    });
+
+    // Управление окном панели
+    document.getElementById('minimize-btn').addEventListener('click', () => {
+      ipcRenderer.send('panel-minimize');
+    });
+
+    document.getElementById('maximize-btn').addEventListener('click', () => {
+      ipcRenderer.send('panel-maximize');
+    });
+
+    document.getElementById('close-btn').addEventListener('click', () => {
+      ipcRenderer.send('panel-close');
+    });
+
+    // Кнопка закрепить
+    const pinBtn = document.getElementById('pinPanelBtn');
+    pinBtn.onclick = (e) => {
+      const btn = e.currentTarget;
+      const pinned = btn.classList.toggle('active');
+
+      // Отправляем запрос с указанием уровня окна
+      ipcRenderer.send('toggle-always-on-top', {
+        state: pinned,
+        level: 'pop-up-menu' // Или 'floating', 'modal-panel' и т.д.
+      });
+    };
+
+    // Обновление иконки maximize
+    ipcRenderer.on('panel-state-changed', (_, isMaximized) => {
+      const btn = document.getElementById('maximize-btn');
+      btn.textContent = isMaximized ? '❐' : '□';
+    });
+
+    // Элементы модального окна
+    const settingsModal = document.getElementById('settingsModal');
+    const hotkeySettingsBtn = document.getElementById('hotkeySettingsBtn');
+    const closeModalBtn = document.querySelector('.close-modal');
+    const currentHotkeyDisplay = document.getElementById('currentHotkeyDisplay');
+    const changeHotkeyBtn = document.getElementById('changeHotkeyBtn');
+    const hotkeyInputContainer = document.getElementById('hotkeyInputContainer');
+    const hotkeyInput = document.getElementById('hotkeyInput');
+    const saveHotkeyBtn = document.getElementById('saveHotkeyBtn');
+    const cancelHotkeyBtn = document.getElementById('cancelHotkeyBtn');
+
+    let isSettingHotkey = false;
+    let newHotkey = '';
+
+    // Загружаем текущую горячую клавишу
+    async function loadCurrentHotkey() {
+      const hotkey = await ipcRenderer.invoke('get-hotkey');
+      currentHotkeyDisplay.textContent = hotkey ? formatHotkey(hotkey) : 'Не задана';
+    }
+    // Добавьте вспомогательную функцию для форматирования горячей клавиши
+    function formatHotkey(hotkey) {
+      return hotkey
+        .replace('CommandOrControl', 'Ctrl')
+        .replace('Command', 'Cmd')
+        .replace('Control', 'Ctrl')
+        .replace('+', ' + ');
+    }
+
+    // Открытие модального окна
+    hotkeySettingsBtn.addEventListener('click', async () => {
+      settingsModal.style.display = 'block';
+      await loadCurrentHotkey();
+    });
+
+    // Закрытие модального окна
+    closeModalBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === settingsModal) {
+        settingsModal.style.display = 'none';
+      }
+    });
+
+    // Начало изменения горячей клавиши
+    changeHotkeyBtn.addEventListener('click', () => {
+      isSettingHotkey = true;
+      newHotkey = '';
+      hotkeyInput.value = 'Нажмите комбинацию клавиш...';
+      hotkeyInputContainer.style.display = 'block';
+      changeHotkeyBtn.style.display = 'none';
+    });
+
+    // Обработчик нажатия клавиш
+    document.addEventListener('keydown', (e) => {
+      if (!isSettingHotkey) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const keys = [];
+      if (e.ctrlKey) keys.push('Ctrl');
+      if (e.metaKey) keys.push('Cmd');
+      if (e.shiftKey) keys.push('Shift');
+      if (e.altKey) keys.push('Alt');
+
+      // Исключаем модификаторы из основного ключа
+      if (!['Control', 'Shift', 'Alt', 'Meta', 'OS'].includes(e.key)) {
+        keys.push(e.key.toUpperCase());
+      }
+
+      newHotkey = keys.join('+');
+      hotkeyInput.value = newHotkey;
+    });
+
+    // Сохранение новой горячей клавиши
+    saveHotkeyBtn.addEventListener('click', async () => {
+      if (newHotkey) {
+        const success = await ipcRenderer.invoke('save-hotkey', newHotkey);
+        if (success) {
+          await loadCurrentHotkey();
+          hotkeyInputContainer.style.display = 'none';
+          changeHotkeyBtn.style.display = 'inline-block';
+          isSettingHotkey = false;
+        } else {
+          alert('Не удалось сохранить горячую клавишу');
+        }
+      }
+    });
+
+    // Отмена изменения горячей клавиши
+    cancelHotkeyBtn.addEventListener('click', () => {
+      isSettingHotkey = false;
+      hotkeyInputContainer.style.display = 'none';
+      changeHotkeyBtn.style.display = 'inline-block';
+    });
+
+    // Инициализация при загрузке
+    loadCurrentHotkey();
+  </script>
+</body>
+
+</html>

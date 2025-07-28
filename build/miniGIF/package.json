@@ -1,0 +1,60 @@
+{
+  "name": "minigif",
+  "version": "1.0.0",
+  "description": "miniGIF Electron App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^5.3.2",
+    "axios": "^1.6.2",
+    "electron-store": "^10.1.0",
+    "extract-zip": "^2.0.1"
+  },
+  "devDependencies": {
+    "electron": "37.2.4",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.minigif.app",
+    "productName": "miniGIF",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "dataManager.js",
+      "notifications.js",
+      "gifUpdater.js",
+      "Gifpage.html",
+      "GifPanel.html",
+      "build/**/*"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "miniGIF"
+    }
+  }
+}
