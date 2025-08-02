@@ -1059,14 +1059,15 @@
 
         /* Системное окно */
         .title-bar {
-            -webkit-app-region: drag;
+            background: linear-gradient(to right, #1a2a4f, #1e3a6e);
+            border-bottom: 1px solid rgba(67, 97, 238, 0.5);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             height: 30px;
-            background-color: #2d2d2d;
-            color: white;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 10px;
+            -webkit-app-region: drag;
             position: fixed;
             top: 0;
             left: 0;
@@ -1197,6 +1198,132 @@
             margin-top: 5px;
             display: none;
         }
+
+        /* Стили для окна обновления */
+        .progress-container {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            height: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--primary);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .progress-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #updateDetails {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 10px;
+            word-break: break-word;
+        }
+
+        /* Добавим стиль для кнопки проверки обновлений */
+        #checkUpdatesBtn {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        #checkUpdatesBtn:hover {
+            background-color: #e68a00;
+            color: white;
+        }
+
+        /* Контейнер для описания обновления */
+        .update-description-container {
+            width: 91%;
+            max-height: 300px;
+            /* Максимальная высота с прокруткой */
+            overflow-y: auto;
+            padding: 20px;
+            margin: 15px 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+        }
+
+        /* Стилизация текста внутри контейнера */
+        #updateDetails {
+            width: 100%;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        #updateDetails h1,
+        #updateDetails h2,
+        #updateDetails h3 {
+            color: var(--success);
+            margin: 15px 0 10px 0;
+        }
+
+        #updateDetails h2 {
+            font-size: 1.3em;
+            /* Чуть крупнее заголовки */
+            padding-bottom: 5px;
+            /* Отступ под заголовком */
+        }
+
+        #updateDetails ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        #updateDetails li {
+            margin-bottom: 8px;
+        }
+
+        #updateDetails strong {
+            color: var(--warning);
+        }
+
+        #updateDetails em {
+            font-style: italic;
+            color: var(--success);
+        }
+
+        #updateDetails hr {
+            border: none;
+            border-top: 1px solid var(--primary);
+            margin: 15px 0;
+        }
+
+        /* Стили для опций импорта */
+        .confirm-btn {
+            background-color: var(--success) !important;
+            color: var(--dark) !important;
+            font-weight: 600;
+        }
+
+        .confirm-btn:hover {
+            background-color: #3aa8d8 !important;
+            color: white !important;
+        }
+
+        .cancel-btn {
+            background-color: var(--danger) !important;
+            color: white !important;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e5176b !important;
+        }
     </style>
 </head>
 
@@ -1225,9 +1352,10 @@
         <button id="toggleGifPanelBtn" class="menu-btn">Открыть GIF панель</button>
         <button id="openAddGifModal" class="menu-btn">+ Добавить GIF</button>
         <button id="openAddCategoryModal" class="menu-btn">+ Добавить категорию</button>
+        <button id="checkUpdatesBtn" class="menu-btn">Проверить обновления</button>
 
         <div class="data-actions-menu">
-            <button class="menu-btn">Экспорт / Импорт GIF ▼</button>
+            <button class="menu-btn">Экспорт/Импорт GIF ▼</button>
             <div class="data-actions-dropdown">
                 <button id="exportBtn">Экспорт GIF</button>
                 <button id="importBtn">Импорт GIF</button>
@@ -1241,6 +1369,35 @@
 
     <div id="listContainer">
         <!-- Категории будут добавляться динамически -->
+    </div>
+
+    <!-- Модальное окно обновления -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <h3>Доступно обновление</h3>
+                <button class="close-modal" onclick="closeModal('updateModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <label id="updateStatus">Проверка обновлений...</label>
+                </div>
+                <div class="update-description-container">
+                    <div id="updateDetails">
+                        <!-- Содержимое будет вставлено автоматически -->
+                    </div>
+                </div>
+                <div class="progress-container" id="updateProgress" style="display: none;">
+                    <div class="progress-bar" id="progressBar"></div>
+                    <div class="progress-text" id="progressText">0%</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="downloadUpdateBtn" style="display: none;">Загрузить обновление</button>
+                <button id="installUpdateBtn" style="display: none;">Установить обновление</button>
+                <button id="remindLaterBtn" class="cancel-btn">Напомнить позже</button>
+            </div>
+        </div>
     </div>
 
     <!-- Модальное окно подтверждения -->
@@ -1368,6 +1525,23 @@
             <div class="modal-footer">
                 <button id="confirmExportBtn">Экспортировать выбранное</button>
                 <button class="cancel-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- модальное окно для импорта -->
+    <div id="importConfirmModal" class="modal">
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <h3>Импорт данных</h3>
+                <button class="close-modal" onclick="closeModal('importConfirmModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Импортировать данные? Существующие данные не будут удалены, а объединятся с импортированными.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmImportBtn" class="confirm-btn">Импортировать</button>
+                <button class="cancel-btn" onclick="closeModal('importConfirmModal')">Отмена</button>
             </div>
         </div>
     </div>
@@ -2203,19 +2377,36 @@
         // Функция импорта данных
         let importInProgress = false;
         async function importData() {
-            try {
-                const result = await ipcRenderer.invoke('import-data');
-                if (result) {
-                    showNotification(`Импорт завершен! Категорий: ${result.categories.length}, Элементов: ${Object.values(result.itemsData).reduce((acc, items) => acc + items.length, 0)}`);
-                    // Обновляем UI
-                    categories = result.categories;
-                    itemsData = result.itemsData;
-                    await updateCategoryUI();
-                }
-            } catch (error) {
-                console.error('Import error:', error);
-                showNotification('Ошибка импорта', error.message);
-            }
+            // Показываем кастомное модальное окно вместо стандартного confirm
+            return new Promise((resolve) => {
+                const modal = document.getElementById('importConfirmModal');
+                modal.style.display = 'flex';
+
+                document.getElementById('confirmImportBtn').onclick = async () => {
+                    closeModal('importConfirmModal');
+                    try {
+                        const result = await ipcRenderer.invoke('import-data');
+                        if (result) {
+                            showNotification(`Импорт завершен! Категорий: ${result.categories.length}, Элементов: ${Object.values(result.itemsData).reduce((acc, items) => acc + items.length, 0)
+                                }`);
+                            // Обновляем UI
+                            categories = result.categories;
+                            itemsData = result.itemsData;
+                            await updateCategoryUI();
+                            resolve(true);
+                        }
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        showNotification('Ошибка импорта', error.message);
+                        resolve(false);
+                    }
+                };
+
+                document.querySelector('#importConfirmModal .cancel-btn').onclick = () => {
+                    closeModal('importConfirmModal');
+                    resolve(false);
+                };
+            });
         }
 
         // Функция открытия модального окна экспорта
@@ -2622,7 +2813,7 @@
             const newUrl = gifUrlElement.value.trim();
 
             if (!newCode) {
-                alert('Пожалуйста, введите код');
+                showNotification('Пожалуйста, введите код', true);
                 return;
             }
 
@@ -2631,11 +2822,25 @@
 
             // Если URL изменился, обновляем гифку
             if (newUrl) {
+                const gifId = itemsData[categoryId][index].gifId;
+                const gifElement = document.getElementById(`gif-${categoryId}-${index}`);
+
+                // Показываем индикатор загрузки
+                gifElement.src = '';
+                gifElement.style.backgroundColor = '#333';
+
                 try {
-                    await ipcRenderer.invoke('update-gif-url', {
-                        gifId: itemsData[categoryId][index].gifId,
+                    const success = await ipcRenderer.invoke('update-gif-url', {
+                        gifId,
                         url: newUrl
                     });
+
+                    if (!success) {
+                        showNotification('Не удалось обновить гифку', true);
+                        // Восстанавливаем старую гифку
+                        const oldPath = await ipcRenderer.invoke('get-gif-path', gifId);
+                        if (oldPath) gifElement.src = oldPath;
+                    }
                 } catch (error) {
                     console.error('Error updating GIF:', error);
                     showNotification('Ошибка при обновлении GIF', true);
@@ -2650,10 +2855,7 @@
 
             // Обновляем отображение кода
             document.getElementById(`code-display-${categoryId}-${index}`).textContent = newCode;
-
-            showNotification('Изменения сохранены');
         }
-
         // Функция для отмены изменений
         function cancelEdits(categoryId, index) {
             const item = itemsData[categoryId][index];
@@ -2697,6 +2899,129 @@
             }
         });
 
+        // Функции для работы с обновлениями
+        function setupAutoUpdater() {
+            ipcRenderer.on('update-available', (event, info) => {
+                document.getElementById('updateStatus').textContent = `Доступна версия ${info.version}`;
+
+                // Форматируем описание обновления
+                let releaseNotes = info.releaseNotes || 'Нет описания изменений';
+                if (typeof releaseNotes === 'string') {
+                    // Если это строка, преобразуем Markdown в HTML
+                    releaseNotes = simpleMarkdownToHTML(releaseNotes);
+                } else if (Array.isArray(releaseNotes)) {
+                    // Если это массив (например, из GitHub), преобразуем в HTML
+                    releaseNotes = releaseNotes.map(note => {
+                        return `<div class="release-note">${simpleMarkdownToHTML(note)}</div>`;
+                    }).join('');
+                }
+
+                document.getElementById('updateDetails').innerHTML = releaseNotes;
+                document.getElementById('downloadUpdateBtn').style.display = 'inline-block';
+                document.getElementById('remindLaterBtn').style.display = 'inline-block';
+                document.getElementById('updateProgress').style.display = 'none';
+                document.getElementById('installUpdateBtn').style.display = 'none';
+                openModal('updateModal');
+            });
+
+            ipcRenderer.on('download-progress', (event, progress) => {
+                const percent = Math.floor(progress.percent);
+                document.getElementById('progressBar').style.width = `${percent}%`;
+                document.getElementById('progressText').textContent = `${percent}%`;
+                document.getElementById('updateProgress').style.display = 'block';
+                document.getElementById('remindLaterBtn').style.display = 'none';
+                document.getElementById('downloadUpdateBtn').style.display = 'none';
+            });
+
+            ipcRenderer.on('update-downloaded', (event, info) => {
+                document.getElementById('installUpdateBtn').style.display = 'inline-block';
+                document.getElementById('downloadUpdateBtn').style.display = 'none';
+                document.getElementById('remindLaterBtn').style.display = 'none';
+                document.getElementById('updateProgress').style.display = 'none';
+                document.getElementById('updateStatus').textContent = 'Готово к установке!';
+            });
+
+            ipcRenderer.on('update-error', (event, error) => {
+                document.getElementById('updateStatus').textContent = `Ошибка: ${error.message}`;
+                document.getElementById('downloadUpdateBtn').style.display = 'none';
+                document.getElementById('remindLaterBtn').style.display = 'inline-block';
+                document.getElementById('updateProgress').style.display = 'none';
+                document.getElementById('installUpdateBtn').style.display = 'none';
+            });
+
+            // Обработчики кнопок
+            document.getElementById('downloadUpdateBtn').addEventListener('click', () => {
+                ipcRenderer.send('download-update');
+                document.getElementById('downloadUpdateBtn').style.display = 'none';
+            });
+
+            document.getElementById('installUpdateBtn').addEventListener('click', () => {
+                ipcRenderer.send('install-update');
+            });
+
+            document.getElementById('remindLaterBtn').addEventListener('click', () => {
+                closeModal('updateModal');
+                // Проверим снова через 24 часа
+                setTimeout(() => {
+                    ipcRenderer.send('check-for-updates');
+                }, 24 * 60 * 60 * 1000);
+            });
+        }
+
+        function simpleMarkdownToHTML(text) {
+            if (!text) return '';
+
+            // Заголовки
+            text = text.replace(/^# (.*$)/gm, '<h3>$1</h3>');
+            text = text.replace(/^## (.*$)/gm, '<h4>$1</h4>');
+            text = text.replace(/^### (.*$)/gm, '<h5>$1</h5>');
+
+            // Списки
+            text = text.replace(/^\* (.*$)/gm, '<li>$1</li>');
+            text = text.replace(/^- (.*$)/gm, '<li>$1</li>');
+            text = text.replace(/^\+ (.*$)/gm, '<li>$1</li>');
+
+            // Группируем элементы списка
+            text = text.replace(/(<li>.*<\/li>)+/g, function (match) {
+                return '<ul>' + match + '</ul>';
+            });
+
+            // Жирный текст
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
+
+            // Курсив
+            text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            text = text.replace(/_(.*?)_/g, '<em>$1</em>');
+
+            // Код
+            text = text.replace(/`(.*?)`/g, '<code>$1</code>');
+
+            // Ссылки
+            text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+            // Переносы строк
+            text = text.replace(/\n\n/g, '</p><p>');
+            text = text.replace(/\n/g, '<br>');
+
+            return '<p>' + text + '</p>';
+        }
+
+        ipcRenderer.on('update-not-available', (event, info) => {
+            showNotification(info.message);
+        });
+
+        ipcRenderer.on('gif-updated', (event, { gifId, newPath }) => {
+            // Находим все элементы с этой гифкой
+            document.querySelectorAll(`img[src*="${gifId}"]`).forEach(img => {
+                // Форсируем обновление
+                img.src = '';
+                setTimeout(() => {
+                    img.src = newPath;
+                }, 50);
+            });
+        });
+
         // Инициализация при загрузке страницы
         window.onload = async function () {
             // Создаем звезды и линии
@@ -2717,6 +3042,12 @@
                 switchCategory(categories[0].key);
             }
 
+            // Добавляем инициализацию автообновления
+            setupAutoUpdater();
+
+            // Проверяем обновления при запуске
+            ipcRenderer.send('check-for-updates');
+
             // Инициализируем цветовое колесо
             setupColorWheel();
 
@@ -2724,19 +3055,16 @@
             updatePanelButton(); // Инициализация текста кнопки
 
             // Обработчики кнопок
+
+            // Обработчик кнопки проверки обновлений
+            document.getElementById('checkUpdatesBtn').addEventListener('click', () => {
+                ipcRenderer.send('check-for-updates');
+                showNotification('Проверка обновлений...');
+            });
             document.getElementById('openAddGifModal').addEventListener('click', () => openModal('addGifModal'));
             document.getElementById('openAddCategoryModal').addEventListener('click', () => openModal('addCategoryModal'));
             document.getElementById('exportBtn').addEventListener('click', exportData);
-            document.getElementById('importBtn').addEventListener('click', async () => {
-                const confirmed = confirm('Импортировать данные? Существующие данные не будут удалены, а объединятся с импортированными.');
-                if (confirmed) {
-                    const result = await ipcRenderer.invoke('import-data');
-                    if (result) {
-                        showNotification(`Импорт завершен! Категорий: ${result.categories.length}, Элементов: ${Object.values(result.itemsData).reduce((acc, items) => acc + items.length, 0)
-                            }`);
-                    }
-                }
-            });
+            document.getElementById('importBtn').addEventListener('click', importData);
             document.getElementById('saveCategoryBtn').addEventListener('click', saveCategoryChanges);
             document.getElementById('exportBtn').addEventListener('click', openExportModal);
             document.getElementById('confirmExportBtn').addEventListener('click', exportSelectedCategories);

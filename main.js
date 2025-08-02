@@ -4,9 +4,14 @@ const fs = require('fs');
 const dataManager = require('./dataManager');
 const GIFS_DIR = path.join(app.getPath('userData'), 'gifs');
 const { globalShortcut } = require('electron');
+const { autoUpdater } = require('electron-updater');
+const { clipboard } = require('electron');
+
+
 
 let mainWindow;
 let gifWindow = null; // Явно инициализируем как null
+let updateWindow = null;
 let tray;
 let currentHotkey = 'CommandOrControl+Shift+G';
 
@@ -134,7 +139,6 @@ function openGifPanel() {
     gifWindow.on('move', debounce(saveWindowBounds, 500));
 }
 
-
 // Функция для сохранения параметров окна
 function saveWindowBounds() {
     if (!gifWindow || gifWindow.isDestroyed()) return;
@@ -208,11 +212,13 @@ async function loadHotkey() {
         const { hotkey } = JSON.parse(savedHotkey);
         if (hotkey) {
             currentHotkey = hotkey;
-            registerHotkey();
         }
     } catch (e) {
-        registerHotkey();
+        console.log('Using default hotkey');
     }
+
+    // Регистрируем основную горячую клавишу
+    registerHotkey();
 }
 
 ipcMain.handle('save-hotkey', async (event, hotkey) => {
@@ -301,19 +307,24 @@ ipcMain.handle('load-initial-data', async () => {
 });
 
 ipcMain.handle('save-data', async (event, data) => {
-    const result = await dataManager.saveData(data);
+    if (data.categories) categories = data.categories;
+    if (data.itemsData) itemsData = data.itemsData;
+
+    const result = await dataManager.saveData({ categories, itemsData });
     BrowserWindow.getAllWindows().forEach(win => {
         win.webContents.send('data-updated');
     });
     return result;
 });
 
+
 ipcMain.handle('create-backup', async () => {
     return dataManager.createBackup();
 });
 
 ipcMain.handle('get-gif-path', async (event, gifId) => {
-    return dataManager.getGifPath(gifId);
+    const gifPath = path.join(app.getPath('userData'), 'gifs', `${gifId}.gif`);
+    return fs.existsSync(gifPath) ? `file://${gifPath}` : null;
 });
 
 ipcMain.handle('get-all-gifs', async () => {
@@ -350,6 +361,28 @@ ipcMain.handle('export-data', async (event, exportData) => {
         data: exportData,
         gifCount: Object.values(exportData.itemsData).reduce((acc, items) => acc + items.length, 0)
     };
+});
+
+ipcMain.on('data-updated', async () => {
+    const data = await dataManager.loadData();
+    const newCategories = data.categories || [];
+    itemsData = data.itemsData || {};
+
+    // Сохраняем текущий порядок категорий при обновлении
+    const currentOrder = categories.map(cat => cat.id);
+    categories = newCategories;
+
+    // Восстанавливаем порядок
+    if (currentOrder.length === categories.length) {
+        categories.sort((a, b) => {
+            return currentOrder.indexOf(a.id) - currentOrder.indexOf(b.id);
+        });
+    }
+
+    // Сохраняем новый порядок
+    await ipcRenderer.invoke('save-categories-order', categories.map(cat => cat.id));
+
+    renderCategories();
 });
 
 ipcMain.handle('save-export-file', async (event, { exportData, filePath }) => {
@@ -489,7 +522,6 @@ ipcMain.handle('import-data', async () => {
         }
     }
 });
-
 ipcMain.handle('save-categories-order', async (event, order) => {
     await fs.promises.writeFile(
         path.join(app.getPath('userData'), 'categories-order.json'),
@@ -536,11 +568,219 @@ function createApplicationMenu() {
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
-app.whenReady().then(() => {
+// Обработчик для получения URL гифки
+ipcMain.handle('get-gif-url', async (event, gifId) => {
+    const gifPath = path.join(__dirname, 'gifs', `${gifId}.gif`);
+
+    try {
+        if (fs.existsSync(gifPath)) {
+            return `file://${gifPath}`;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting GIF URL:', error);
+        return null;
+    }
+});
+
+// Обработчик для обновления URL гифки
+ipcMain.handle('update-gif-url', async (event, { gifId, url }) => {
+    try {
+        const GIFS_DIR = path.join(app.getPath('userData'), 'gifs');
+
+        // Создаем директорию, если не существует
+        if (!fs.existsSync(GIFS_DIR)) {
+            fs.mkdirSync(GIFS_DIR, { recursive: true });
+        }
+
+        const gifPath = path.join(GIFS_DIR, `${gifId}.gif`);
+        const tempPath = path.join(GIFS_DIR, `${gifId}_temp.gif`);
+
+        // Загружаем новую гифку во временный файл
+        const response = await fetch(url);
+        const buffer = await response.arrayBuffer();
+        fs.writeFileSync(tempPath, Buffer.from(buffer));
+
+        // Удаляем старый файл (если есть)
+        if (fs.existsSync(gifPath)) {
+            fs.unlinkSync(gifPath);
+        }
+
+        // Переименовываем временный файл
+        fs.renameSync(tempPath, gifPath);
+
+        // Форсируем обновление во всех окнах
+        BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('gif-updated', {
+                gifId,
+                newPath: `file://${gifPath}?t=${Date.now()}`
+            });
+        });
+
+        return true;
+    } catch (error) {
+        console.error('Error updating GIF:', error);
+        return false;
+    }
+});
+
+// Функция регистрации шорткатов
+function registerShortcuts(shortcuts = []) {
+    try {
+        // Сначала снимаем все шорткаты, кроме основной горячей клавиши
+        globalShortcut.unregisterAll();
+
+        // Регистрируем основную горячую клавишу
+        if (currentHotkey) {
+            globalShortcut.register(currentHotkey, toggleGifPanel);
+        }
+
+        // Регистрируем шорткаты для GIF
+        shortcuts.forEach(shortcut => {
+            try {
+                if (shortcut.key && shortcut.key !== currentHotkey) {
+                    globalShortcut.register(shortcut.key, () => {
+                        const codeWithSpace = shortcut.gifCode + ' ';
+                        clipboard.writeText(codeWithSpace);
+
+                        BrowserWindow.getAllWindows().forEach(win => {
+                            win.webContents.send('show-global-notification', {
+                                message: `Скопировано: ${shortcut.gifCode.trim()}`
+                            });
+                        });
+                    });
+                }
+            } catch (e) {
+                console.error(`Failed to register shortcut ${shortcut.key}:`, e);
+            }
+        });
+    } catch (e) {
+        console.error('Error registering shortcuts:', e);
+    }
+}
+
+async function loadShortcuts() {
+    try {
+        const data = await fs.promises.readFile(
+            path.join(app.getPath('userData'), 'shortcuts.json'),
+            'utf-8'
+        );
+        return JSON.parse(data);
+    } catch (e) {
+        return [];
+    }
+}
+
+// Обработчики для шорткатов
+ipcMain.handle('load-shortcuts', async () => {
+    try {
+        const data = await fs.promises.readFile(
+            path.join(app.getPath('userData'), 'shortcuts.json'),
+            'utf-8'
+        );
+        return JSON.parse(data);
+    } catch (e) {
+        return [];
+    }
+});
+
+ipcMain.handle('save-shortcuts', async (event, shortcuts) => {
+    try {
+        await fs.promises.writeFile(
+            path.join(app.getPath('userData'), 'shortcuts.json'),
+            JSON.stringify(shortcuts)
+        );
+
+        // Перерегистрируем шорткаты после сохранения
+        registerShortcuts(shortcuts);
+
+        // Уведомляем все окна о новых шорткатах
+        BrowserWindow.getAllWindows().forEach(win => {
+            win.webContents.send('shortcuts-updated', shortcuts);
+        });
+
+        return true;
+    } catch (e) {
+        console.error('Error saving shortcuts:', e);
+        return false;
+    }
+});
+
+ipcMain.on('check-for-updates', () => {
+    autoUpdater.autoDownload = false; // Отключаем автоматическую загрузку
+    autoUpdater.checkForUpdates().catch(err => {
+        console.error('Ошибка при проверке обновлений:', err);
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('update-error', {
+                message: 'Не удалось проверить обновления'
+            });
+        }
+    });
+});
+
+ipcMain.on('download-update', () => {
+    autoUpdater.downloadUpdate();
+});
+
+ipcMain.on('install-update', () => {
+    autoUpdater.quitAndInstall();
+});
+
+// Обработчики событий автообновления
+autoUpdater.on('update-available', (info) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-available', {
+            version: info.version,
+            releaseNotes: info.releaseNotes
+        });
+    }
+});
+
+autoUpdater.on('download-progress', (progress) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('download-progress', progress);
+    }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-downloaded', info);
+    }
+});
+
+autoUpdater.on('error', (error) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-error', error);
+    }
+});
+
+autoUpdater.on('update-not-available', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-not-available', {
+            message: 'У вас установлена последняя версия'
+        });
+    }
+});
+
+app.whenReady().then(async () => {
     createApplicationMenu();
     createMainWindow();
     createTray();
-    loadHotkey();
+
+    try {
+        // Сначала загружаем горячую клавишу
+        await loadHotkey();
+
+        // Затем загружаем и регистрируем шорткаты
+        const shortcuts = await loadShortcuts();
+        registerShortcuts(shortcuts);
+
+        console.log('All shortcuts registered successfully');
+    } catch (err) {
+        console.error('Failed to register shortcuts:', err);
+    }
+
+    autoUpdater.checkForUpdatesAndNotify();
 });
 
 app.on('window-all-closed', () => {
@@ -555,7 +795,7 @@ app.on('activate', () => {
     }
 });
 
-app.on('before-quit', (event) => {
+app.on('before-quit', async (event) => {
     // Сохраняем параметры окна перед закрытием
     if (gifWindow && !gifWindow.isDestroyed()) {
         saveWindowBounds();
