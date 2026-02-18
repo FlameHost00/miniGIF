@@ -92,12 +92,25 @@ function createMainWindow() {
     });
 }
 
+// Улучшенная функция открытия панели
 function openGifPanel() {
+    // Проверяем, существует ли окно, не уничтожено ли оно И видимо ли оно
     if (gifWindow && !gifWindow.isDestroyed()) {
-        gifWindow.focus();
+        if (gifWindow.isVisible()) {
+            gifWindow.focus(); // Если видимо - фокусируем
+        } else {
+            // Если невидимо - пробуем показать
+            gifWindow.show();
+        }
         return;
     }
 
+    // Если окна нет или оно уничтожено - создаем новое
+    createNewGifPanel();
+}
+
+// Выносим логику создания в отдельную функцию
+function createNewGifPanel() {
     const savedBounds = getSavedWindowBounds();
 
     gifWindow = new BrowserWindow({
@@ -131,7 +144,6 @@ function openGifPanel() {
             mainWindow.webContents.send('gif-panel-state-changed', false);
         }
         gifWindow = null;
-
     });
 
     // Сохраняем размеры и положение при изменении
@@ -139,7 +151,7 @@ function openGifPanel() {
     gifWindow.on('move', debounce(saveWindowBounds, 500));
 }
 
-// Функция для сохранения параметров окна
+// Улучшенная функция для сохранения параметров окна
 function saveWindowBounds() {
     if (!gifWindow || gifWindow.isDestroyed()) return;
 
@@ -161,19 +173,24 @@ function saveWindowBounds() {
     }
 }
 
-// Функция для загрузки сохраненных параметров
+// Улучшенная функция для загрузки сохраненных параметров
 function getSavedWindowBounds() {
+    const defaultBounds = { x: undefined, y: undefined, width: 400, height: 500 };
     try {
         const data = fs.readFileSync(
             path.join(app.getPath('userData'), 'gif-panel-bounds.json'),
             'utf-8'
         );
-        return JSON.parse(data);
-    } catch (err) {
+        const saved = JSON.parse(data);
+        // Гарантируем, что x и y существуют и являются числами
         return {
-            width: 400,
-            height: 500
+            x: typeof saved.x === 'number' ? saved.x : undefined,
+            y: typeof saved.y === 'number' ? saved.y : undefined,
+            width: saved.width || defaultBounds.width,
+            height: saved.height || defaultBounds.height
         };
+    } catch (err) {
+        return defaultBounds; // Возвращаем полный объект с умолчаниями
     }
 }
 
