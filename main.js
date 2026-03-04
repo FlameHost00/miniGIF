@@ -723,6 +723,60 @@ ipcMain.handle('save-shortcuts', async (event, shortcuts) => {
     }
 });
 
+ipcMain.handle('show-import-notifications', async (event, newItems) => {
+    try {
+        if (!newItems || newItems.length === 0) {
+            console.log('Нет новых элементов для уведомлений');
+            return true;
+        }
+
+        console.log(`Новых элементов: ${newItems.length}`);
+        
+        // Если новых элементов больше 10, показываем сводку по категориям
+        if (newItems.length > 10) {
+            // Группируем по категориям
+            const categoriesSummary = {};
+            newItems.forEach(item => {
+                if (!categoriesSummary[item.categoryName]) {
+                    categoriesSummary[item.categoryName] = 0;
+                }
+                categoriesSummary[item.categoryName]++;
+            });
+            
+            // Отправляем сводку
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('show-import-bulk-notification', {
+                    totalCount: newItems.length,
+                    categories: categoriesSummary
+                });
+            }
+            return true;
+        }
+        
+        // Если элементов 10 или меньше, показываем по одному
+        for (const item of newItems) {
+            const gifPath = path.join(app.getPath('userData'), 'gifs', `${item.gifId}.gif`);
+            const gifExists = fs.existsSync(gifPath);
+            
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('show-import-item-notification', {
+                    categoryName: item.categoryName,
+                    code: item.code,
+                    gifId: item.gifId,
+                    gifPath: gifExists ? `file://${gifPath}?t=${Date.now()}` : null
+                });
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 800));
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error showing import notifications:', error);
+        return false;
+    }
+});
+
 ipcMain.on('check-for-updates', () => {
     autoUpdater.autoDownload = false; // Отключаем автоматическую загрузку
     autoUpdater.checkForUpdates().catch(err => {

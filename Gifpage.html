@@ -1324,6 +1324,216 @@
         .cancel-btn:hover {
             background-color: #e5176b !important;
         }
+
+                /* Стили для уведомлений о новых импортированных элементах */
+        .import-notification-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .import-notification {
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--success);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .import-notification.fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .import-notification-gif {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .import-notification-content {
+            flex-grow: 1;
+        }
+
+        .import-notification-category {
+            font-size: 14px;
+            color: var(--success);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .import-notification-code {
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            background-color: rgba(67, 97, 238, 0.3);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .import-notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .import-notification-close:hover {
+            opacity: 1;
+        }
+
+        /* Стили для счетчика новых элементов */
+        .import-summary-notification {
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+            border: 2px solid white;
+            border-radius: 50px;
+            padding: 12px 20px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 201, 240, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0);
+            }
+        }
+
+        .import-summary-icon {
+            font-size: 24px;
+        }
+
+        .import-summary-text {
+            font-size: 16px;
+        }
+
+        .import-summary-count {
+            background-color: white;
+            color: var(--success);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+                /* Стили для массового уведомления */
+        .import-bulk-notification {
+            background: linear-gradient(135deg, #4361ee, #3f37c9);
+            border: 2px solid white;
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease-out;
+            margin-bottom: 10px;
+            min-width: 300px;
+        }
+
+        .import-bulk-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .import-bulk-icon {
+            font-size: 24px;
+        }
+
+        .import-bulk-count {
+            background-color: white;
+            color: #4361ee;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .import-bulk-categories {
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            padding-top: 15px;
+        }
+
+        .import-bulk-category {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        .import-bulk-category-name {
+            font-weight: 500;
+        }
+
+        .import-bulk-category-count {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
     </style>
 </head>
 
@@ -1346,6 +1556,8 @@
 
     <h1>Коллекция эмоций и танцев</h1>
     <div class="copied-notice" id="copiedNotice">Скопировано!</div>
+
+    <div class="import-notification-container" id="importNotificationContainer"></div>
 
     <!-- Верхнее меню -->
     <div class="header-menu">
@@ -2374,10 +2586,164 @@
             }
         }
 
+                // Функция для отображения уведомления о новом импортированном элементе
+        function showImportItemNotification(item) {
+            console.log('Получено уведомление:', item); // Отладка
+            
+            const container = document.getElementById('importNotificationContainer');
+            if (!container) {
+                console.error('Контейнер уведомлений не найден!');
+                return;
+            }
+            
+            // Проверяем, есть ли уже уведомление с таким GIF ID
+            const existingNotifications = container.querySelectorAll('.import-notification');
+            for (const notif of existingNotifications) {
+                if (notif.dataset.gifId === item.gifId) {
+                    console.log('Уведомление уже существует, пропускаем');
+                    return;
+                }
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = 'import-notification';
+            notification.dataset.gifId = item.gifId;
+            
+            // Создаем содержимое уведомления с проверкой наличия данных
+            const categoryName = item.categoryName || 'Неизвестная категория';
+            const code = item.code || 'Без кода';
+            const gifSrc = item.gifPath || '';
+            
+            notification.innerHTML = `
+                <img class="import-notification-gif" src="${gifSrc}" alt="GIF" 
+                    onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%3E%3Crect%20width%3D%2260%22%20height%3D%2260%22%20fill%3D%22%23333%22%2F%3E%3Ctext%20x%3D%2215%22%20y%3D%2235%22%20fill%3D%22white%22%20font-size%3D%2212%22%3EGIF%3C%2Ftext%3E%3C%2Fsvg%3E'">
+                <div class="import-notification-content">
+                    <div class="import-notification-category">📁 ${categoryName}</div>
+                    <div class="import-notification-code">${code}</div>
+                    <div style="font-size: 12px; color: #4cc9f0; margin-top: 3px;">✨ Новый элемент</div>
+                </div>
+                <button class="import-notification-close" onclick="this.parentElement.classList.add('fade-out'); setTimeout(() => this.parentElement.remove(), 300)">×</button>
+            `;
+            
+            container.appendChild(notification);
+            console.log('Уведомление добавлено в контейнер');
+            
+            // Автоматически скрываем через 5 секунд
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        // Обработчик для получения уведомлений
+        ipcRenderer.on('show-import-item-notification', (event, item) => {
+            console.log('Получено событие show-import-item-notification:', item);
+            showImportItemNotification(item);
+        });
+
+            // Функция для показа сводки об импорте
+            function showImportSummary(count) {
+                if (count === 0) return;
+                
+                const container = document.getElementById('importNotificationContainer');
+                
+                // Удаляем предыдущую сводку, если есть
+                const oldSummary = container.querySelector('.import-summary-notification');
+                if (oldSummary) oldSummary.remove();
+                
+                const summary = document.createElement('div');
+                summary.className = 'import-summary-notification';
+                summary.innerHTML = `
+                    <span class="import-summary-icon">🎉</span>
+                    <span class="import-summary-text">Импортировано новых элементов</span>
+                    <span class="import-summary-count">${count}</span>
+                `;
+                
+                container.insertBefore(summary, container.firstChild);
+                
+                // Автоматически скрываем через 7 секунд
+                setTimeout(() => {
+                    if (summary.parentElement) {
+                        summary.style.opacity = '0';
+                        summary.style.transition = 'opacity 0.3s';
+                        setTimeout(() => {
+                            if (summary.parentElement) {
+                                summary.remove();
+                            }
+                        }, 300);
+                    }
+                }, 7000);
+            }
+
+                        // Функция для отображения массового уведомления (при >10 новых элементов)
+            function showImportBulkNotification(data) {
+                const container = document.getElementById('importNotificationContainer');
+                if (!container) return;
+                
+                // Удаляем предыдущее массовое уведомление, если есть
+                const oldBulk = container.querySelector('.import-bulk-notification');
+                if (oldBulk) oldBulk.remove();
+                
+                const notification = document.createElement('div');
+                notification.className = 'import-bulk-notification';
+                
+                // Создаем список категорий
+                let categoriesHtml = '';
+                for (const [category, count] of Object.entries(data.categories)) {
+                    categoriesHtml += `
+                        <div class="import-bulk-category">
+                            <span class="import-bulk-category-name">📁 ${category}</span>
+                            <span class="import-bulk-category-count">+${count}</span>
+                        </div>
+                    `;
+                }
+                
+                notification.innerHTML = `
+                    <div class="import-bulk-header">
+                        <span class="import-bulk-icon">📦</span>
+                        <span>Массовый импорт</span>
+                        <span class="import-bulk-count">${data.totalCount}</span>
+                    </div>
+                    <div class="import-bulk-categories">
+                        ${categoriesHtml}
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #aaccff; text-align: center;">
+                        Показано ${Object.keys(data.categories).length} категорий
+                    </div>
+                    <button class="import-notification-close" style="position: absolute; top: 10px; right: 10px;" 
+                            onclick="this.parentElement.classList.add('fade-out'); setTimeout(() => this.parentElement.remove(), 300)">×</button>
+                `;
+                
+                container.appendChild(notification);
+                
+                // Автоматически скрываем через 7 секунд
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.classList.add('fade-out');
+                        setTimeout(() => {
+                            if (notification.parentElement) {
+                                notification.remove();
+                            }
+                        }, 300);
+                    }
+                }, 7000);
+            }
+
+            // Добавляем обработчик для массовых уведомлений
+            ipcRenderer.on('show-import-bulk-notification', (event, data) => {
+                showImportBulkNotification(data);
+            });
+
         // Функция импорта данных
         let importInProgress = false;
+                // Функция импорта данных (ЗАМЕНИТЬ существующую)
         async function importData() {
-            // Показываем кастомное модальное окно вместо стандартного confirm
             return new Promise((resolve) => {
                 const modal = document.getElementById('importConfirmModal');
                 modal.style.display = 'flex';
@@ -2387,17 +2753,30 @@
                     try {
                         const result = await ipcRenderer.invoke('import-data');
                         if (result) {
-                            showNotification(`Импорт завершен! Категорий: ${result.categories.length}, Элементов: ${Object.values(result.itemsData).reduce((acc, items) => acc + items.length, 0)
-                                }`);
-                            // Обновляем UI
                             categories = result.categories;
                             itemsData = result.itemsData;
                             await updateCategoryUI();
+                            
+                            const totalItems = Object.values(result.itemsData).reduce((acc, items) => acc + items.length, 0);
+                            showNotification(`Импорт завершен! Всего: ${totalItems} элементов`);
+                            
+                            if (result.newItems && result.newItems.length > 0) {
+                                // Показываем сводку
+                                showImportSummary(result.newItems.length);
+                                
+                                // Отправляем на обработку (main сам решит, как показывать)
+                                ipcRenderer.invoke('show-import-notifications', result.newItems);
+                                
+                                showNotification(`➕ Добавлено новых элементов: ${result.newItems.length}`);
+                            } else {
+                                showNotification('Новых элементов не найдено (все уже существуют)');
+                            }
+                            
                             resolve(true);
                         }
                     } catch (error) {
                         console.error('Import error:', error);
-                        showNotification('Ошибка импорта', error.message);
+                        showNotification('Ошибка импорта: ' + error.message, true);
                         resolve(false);
                     }
                 };
@@ -3137,6 +3516,11 @@
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
                     e.target.focus();
                 }
+            });
+
+            // Обработчик для получения уведомлений из main процесса
+            ipcRenderer.on('show-import-item-notification', (event, item) => {
+                showImportItemNotification(item);
             });
         };
 

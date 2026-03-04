@@ -39,6 +39,18 @@ function exportWithFiles(data, targetDir) {
 
 function mergeData(newData) {
     const currentData = loadData();
+    
+    // Собираем все существующие GIF ID из текущих данных
+    const existingGifIds = new Set();
+    for (const items of Object.values(currentData.itemsData)) {
+        items.forEach(item => existingGifIds.add(item.gifId));
+    }
+
+    // Создаем карту категорий для быстрого доступа к названиям
+    const categoryMap = {};
+    newData.categories.forEach(cat => {
+        categoryMap[cat.id] = cat.name;
+    });
 
     // Объединяем категории (с проверкой дубликатов по ID)
     const mergedCategories = [...currentData.categories];
@@ -53,16 +65,37 @@ function mergeData(newData) {
 
     // Объединяем itemsData с проверкой дубликатов GIF
     const mergedItemsData = { ...currentData.itemsData };
+    const newItems = []; // Массив для действительно новых элементов
+    
     for (const [catId, items] of Object.entries(newData.itemsData)) {
         if (!mergedItemsData[catId]) {
             mergedItemsData[catId] = [];
         }
 
-        const existingGifs = new Set(mergedItemsData[catId].map(item => item.gifId));
-        const newItems = items.filter(item => !existingGifs.has(item.gifId));
+        const existingGifsInCategory = new Set(mergedItemsData[catId].map(item => item.gifId));
+        const newItemsInCategory = items.filter(item => !existingGifsInCategory.has(item.gifId));
 
-        if (newItems.length > 0) {
-            mergedItemsData[catId] = [...mergedItemsData[catId], ...newItems];
+        if (newItemsInCategory.length > 0) {
+            // Добавляем информацию только о тех элементах, которых нет ВООБЩЕ нигде в приложении
+            newItemsInCategory.forEach(item => {
+                // Проверяем, что такого GIF ID нет ни в одной категории
+                if (!existingGifIds.has(item.gifId)) {
+                    newItems.push({
+                        categoryId: catId,
+                        categoryName: categoryMap[catId] || 'Неизвестная категория',
+                        code: item.code,
+                        gifId: item.gifId
+                    });
+                    console.log('Новый элемент для уведомления:', { // Для отладки
+                        categoryId: catId,
+                        categoryName: categoryMap[catId],
+                        code: item.code,
+                        gifId: item.gifId
+                    });
+                }
+            });
+            
+            mergedItemsData[catId] = [...mergedItemsData[catId], ...newItemsInCategory];
         } else {
             console.warn(`Все элементы категории ${catId} уже существуют, пропускаем`);
         }
@@ -71,7 +104,8 @@ function mergeData(newData) {
     return {
         categories: mergedCategories,
         itemsData: mergedItemsData,
-        gifs: { ...currentData.gifs, ...newData.gifs }
+        gifs: { ...currentData.gifs, ...newData.gifs },
+        newItems: newItems // Только действительно новые элементы
     };
 }
 
