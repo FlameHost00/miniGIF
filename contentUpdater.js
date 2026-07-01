@@ -7,7 +7,7 @@ const dataManager = require('./dataManager');
 
 const CONTENT_VERSION_FILE = path.join(app.getPath('userData'), 'content_version.json');
 const GITHUB_API_URL = 'https://api.github.com/repos/FlameHost00/miniGIF/contents/gifs_content.json';
-const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/FlameHost00/miniGIF/main/gifs_content.json';
+const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/FlameHost00/miniGIF/master/gifs_content.json';
 
 let contentUpdateData = null;
 

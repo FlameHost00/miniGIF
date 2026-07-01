@@ -1974,6 +1974,7 @@
         <button id="openAddGifModal" class="menu-btn">+ Добавить GIF</button>
         <button id="openAddCategoryModal" class="menu-btn">+ Добавить категорию</button>
         <button id="checkUpdatesBtn" class="menu-btn">Проверить обновления</button>
+        <button id="checkContentBtn" class="menu-btn">🔄 Проверить новые GIF</button>
 
         <div class="data-actions-menu">
             <button class="menu-btn">Экспорт/Импорт GIF ▼</button>
@@ -4416,6 +4417,24 @@
             const resetSettingsBtn = document.getElementById('resetSettingsBtn');
             if (resetSettingsBtn) {
                 resetSettingsBtn.addEventListener('click', resetHotkeySettings);
+            }
+
+            const checkContentBtn = document.getElementById('checkContentBtn');
+            if (checkContentBtn) {
+                checkContentBtn.addEventListener('click', async () => {
+                    showNotification('🔍 Проверка новых GIF...');
+                    try {
+                        const hasUpdate = await ipcRenderer.invoke('check-content-updates');
+                        if (hasUpdate) {
+                            showNotification('✅ Новые GIF доступны! Нажмите "Обновить" в уведомлении');
+                        } else {
+                            showNotification('ℹ️ Новых GIF нет');
+                        }
+                    } catch (error) {
+                        console.error('Ошибка проверки:', error);
+                        showNotification('❌ Ошибка проверки', true);
+                    }
+                });
             }
 
             // ===== НАСТРОЙКИ ГОРЯЧИХ КЛАВИШ =====
