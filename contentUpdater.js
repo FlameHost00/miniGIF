@@ -52,32 +52,46 @@ async function applyContentUpdate() {
     if (!contentUpdateData) return false;
     
     try {
+        console.log('📥 Начинаем обновление контента...');
         const newContent = contentUpdateData.content;
-        
-        // Сохраняем текущие данные пользователя
         const userData = dataManager.loadData();
         
-        // Получаем системную категорию
         const systemCategory = userData.categories.find(c => c.id === 'system_gifs');
         if (!systemCategory) {
             throw new Error('Системная категория не найдена');
         }
         
-        // Обновляем элементы в системной категории
         const newSystemItems = newContent.systemGifs || [];
         const currentSystemItems = userData.itemsData['system_gifs'] || [];
-        
-        // Находим новые элементы (которых еще нет)
         const existingCodes = new Set(currentSystemItems.map(item => item.code));
         const newItems = newSystemItems.filter(item => !existingCodes.has(item.code));
         
-        // Добавляем новые элементы
-        for (const newItem of newItems) {
-            const gifId = `gif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        console.log(`📦 Новых элементов: ${newItems.length}`);
+        
+        // Отправляем начальное состояние прогресса
+        sendProgressUpdate(0, newItems.length, 'Подготовка к загрузке...', '');
+        
+        let downloadedCount = 0;
+        let totalCount = newItems.length;
+        
+        for (let i = 0; i < newItems.length; i++) {
+            const newItem = newItems[i];
+            const gifId = newItem.gifId;
             
-            // Загружаем GIF из репозитория
-            const gifUrl = `https://raw.githubusercontent.com/FlameHost00/miniGIF/main/gifs/${newItem.gifId}.gif`;
-            await dataManager.saveGif(gifId, gifUrl);
+            // Отправляем прогресс
+            const progress = Math.round(((i) / totalCount) * 100);
+            sendProgressUpdate(progress, totalCount, `Загрузка: ${newItem.code}`, newItem.code);
+            
+            const gifUrl = `https://raw.githubusercontent.com/FlameHost00/miniGIF/master/gifs/${gifId}.gif`;
+            console.log(`📥 Скачивание (${i+1}/${totalCount}): ${gifUrl}`);
+            
+            const success = await dataManager.saveGif(gifId, gifUrl);
+            if (success) {
+                downloadedCount++;
+                console.log(`✅ Скачан: ${newItem.code}`);
+            } else {
+                console.log(`❌ Ошибка скачивания: ${newItem.code}`);
+            }
             
             currentSystemItems.push({
                 code: newItem.code,
@@ -85,30 +99,32 @@ async function applyContentUpdate() {
             });
         }
         
-        // Сохраняем обновленные данные
+        // Отправляем финальный прогресс
+        sendProgressUpdate(100, totalCount, 'Загрузка завершена! ✅', '');
+        
         userData.itemsData['system_gifs'] = currentSystemItems;
         dataManager.saveData(userData);
         
-        // Сохраняем новую версию
-        saveCurrentContentVersion(contentUpdateData.version, contentUpdateData.sha);
-        
-        // Отправляем уведомление
-        if (newItems.length > 0) {
-            // Показываем уведомление о новых GIF
-            const mainWindow = require('electron').BrowserWindow.getAllWindows()[0];
-            if (mainWindow) {
-                mainWindow.webContents.send('new-system-gifs', {
-                    count: newItems.length,
-                    items: newItems
-                });
-            }
-        }
-        
+        console.log(`✅ Обновление завершено! Скачано: ${downloadedCount}/${totalCount}`);
         return true;
     } catch (error) {
-        console.error('Error applying content update:', error);
+        console.error('❌ Error applying content update:', error);
+        sendProgressUpdate(-1, 0, 'Ошибка загрузки', '');
         return false;
     }
+}
+
+// Функция для отправки прогресса в UI
+function sendProgressUpdate(percent, total, status, currentGif) {
+    const windows = require('electron').BrowserWindow.getAllWindows();
+    windows.forEach(win => {
+        win.webContents.send('content-update-progress', {
+            percent: percent,
+            total: total,
+            status: status,
+            currentGif: currentGif
+        });
+    });
 }
 
 // Функция для получения текущей версии контента

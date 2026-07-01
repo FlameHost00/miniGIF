@@ -1942,6 +1942,47 @@
 .search-result-item .action-container {
     overflow: visible !important;
 }
+
+/* Стили для прогресс-бара загрузки GIF */
+#contentUpdateProgress .progress-container {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    height: 24px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--primary);
+}
+
+#contentUpdateProgress .progress-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+}
+
+#contentUpdateProgress .progress-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+}
+
+#contentUpdateProgress #progressStatus {
+    color: #a29bfe;
+}
+
+#contentUpdateProgress #currentGifName {
+    color: #888;
+    font-size: 12px;
+    min-height: 18px;
+    display: inline-block;
+}
         
     </style>
 </head>
@@ -2020,6 +2061,23 @@
                         <!-- Содержимое будет вставлено автоматически -->
                     </div>
                 </div>
+                
+                <!-- ===== ПРОГРЕСС-БАР ЗАГРУЗКИ GIF ===== -->
+                <div id="contentUpdateProgress" style="display: none; margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: white; font-size: 13px;" id="progressStatus">Загрузка GIF...</span>
+                        <span style="color: white; font-size: 13px;" id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-container" style="height: 24px;">
+                        <div class="progress-bar" id="contentProgressBar" style="width: 0%; background: linear-gradient(90deg, #6c5ce7, #a29bfe);"></div>
+                        <div class="progress-text" id="progressTextGif">0 / 0</div>
+                    </div>
+                    <div style="margin-top: 8px; text-align: center;">
+                        <span style="color: #888; font-size: 12px;" id="currentGifName">Подготовка...</span>
+                    </div>
+                </div>
+                <!-- ===== КОНЕЦ ПРОГРЕСС-БАРА ===== -->
+                
                 <div class="progress-container" id="updateProgress" style="display: none;">
                     <div class="progress-bar" id="progressBar"></div>
                     <div class="progress-text" id="progressText">0%</div>
@@ -2214,9 +2272,8 @@
             }
         };
 
-                // Функция для создания уведомления об обновлении контента
+        // Функция для создания уведомления об обновлении контента
         function createContentUpdateNotification() {
-            // Проверяем, существует ли уже уведомление
             let container = document.getElementById('contentUpdateNotification');
             if (container) {
                 container.style.display = 'block';
@@ -2253,31 +2310,41 @@
             `;
             document.body.appendChild(container);
             
-            // Обработчик кнопки "Обновить"
             document.getElementById('applyContentUpdateBtn').addEventListener('click', async () => {
                 try {
+                    // Показываем прогресс-бар
+                    const progressContainer = document.getElementById('contentUpdateProgress');
+                    if (progressContainer) {
+                        progressContainer.style.display = 'block';
+                    }
+                    
+                    // Скрываем кнопки
+                    document.getElementById('applyContentUpdateBtn').style.display = 'none';
+                    document.getElementById('dismissContentUpdateBtn').style.display = 'none';
+                    
                     const success = await ipcRenderer.invoke('apply-content-update');
                     if (success) {
                         showNotification('✅ Контент обновлен!');
-                        container.style.display = 'none';
-                        // Перезагружаем данные
-                        const data = await ipcRenderer.invoke('load-initial-data');
-                        categories = data.categories || [];
-                        itemsData = data.itemsData || {};
-                        await updateCategoryUI();
-                        if (categories.length > 0) {
-                            switchCategory(categories[0].key);
-                        }
+                        // Прогресс-бар скроется автоматически через 3 секунды
+                        setTimeout(() => {
+                            const notification = document.getElementById('contentUpdateNotification');
+                            if (notification) notification.style.display = 'none';
+                            // Перезагружаем данные
+                            location.reload();
+                        }, 2000);
                     } else {
                         showNotification('❌ Ошибка обновления контента', true);
+                        document.getElementById('applyContentUpdateBtn').style.display = 'inline-block';
+                        document.getElementById('dismissContentUpdateBtn').style.display = 'inline-block';
                     }
                 } catch (error) {
                     console.error('Error applying content update:', error);
                     showNotification('❌ Ошибка обновления контента', true);
+                    document.getElementById('applyContentUpdateBtn').style.display = 'inline-block';
+                    document.getElementById('dismissContentUpdateBtn').style.display = 'inline-block';
                 }
             });
             
-            // Обработчик кнопки "Позже"
             document.getElementById('dismissContentUpdateBtn').addEventListener('click', () => {
                 container.style.display = 'none';
             });
@@ -2285,12 +2352,19 @@
             return container;
         }
 
+
         // Функция для показа уведомления о новом контенте
         function showContentUpdateNotification(data) {
             const notification = createContentUpdateNotification();
             notification.style.display = 'block';
             document.getElementById('contentUpdateVersion').textContent = data.version || '1.0.0';
             document.getElementById('contentUpdateCount').textContent = data.count || 0;
+            
+            // Скрываем прогресс-бар при открытии уведомления
+            const progressContainer = document.getElementById('contentUpdateProgress');
+            if (progressContainer) {
+                progressContainer.style.display = 'none';
+            }
         }
 
         // Проверка, является ли категория системной
@@ -4419,6 +4493,7 @@
                 resetSettingsBtn.addEventListener('click', resetHotkeySettings);
             }
 
+            // Кнопка проверки новых GIF
             const checkContentBtn = document.getElementById('checkContentBtn');
             if (checkContentBtn) {
                 checkContentBtn.addEventListener('click', async () => {
@@ -4426,7 +4501,12 @@
                     try {
                         const hasUpdate = await ipcRenderer.invoke('check-content-updates');
                         if (hasUpdate) {
-                            showNotification('✅ Новые GIF доступны! Нажмите "Обновить" в уведомлении');
+                            // ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ С ПРЕДЛОЖЕНИЕМ ОБНОВИТЬ
+                            showContentUpdateNotification({
+                                version: '1.0.1',
+                                count: 91
+                            });
+                            showNotification('✅ Новые GIF доступны! Нажмите "Обновить" в окне');
                         } else {
                             showNotification('ℹ️ Новых GIF нет');
                         }
@@ -4491,6 +4571,53 @@
                     console.error('Error checking content updates:', error);
                 }
             }, 3000);
+
+                        // Обработчик прогресса загрузки контента
+            ipcRenderer.on('content-update-progress', (event, data) => {
+                console.log('📊 Прогресс:', data);
+                
+                const progressContainer = document.getElementById('contentUpdateProgress');
+                const progressBar = document.getElementById('contentProgressBar');
+                const progressPercent = document.getElementById('progressPercent');
+                const progressText = document.getElementById('progressTextGif');
+                const progressStatus = document.getElementById('progressStatus');
+                const currentGifName = document.getElementById('currentGifName');
+                
+                if (!progressContainer) return;
+                
+                // Показываем контейнер прогресса
+                progressContainer.style.display = 'block';
+                
+                const total = data.total || 0;
+                const percent = data.percent || 0;
+                
+                // Обновляем прогресс-бар
+                progressBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+                progressPercent.textContent = Math.max(0, Math.min(100, percent)) + '%';
+                
+                // Обновляем текст
+                if (percent === 100) {
+                    progressText.textContent = `✅ ${total} / ${total}`;
+                    progressStatus.textContent = '✅ Загрузка завершена!';
+                    currentGifName.textContent = '';
+                    
+                    // Через 2 секунды скрываем прогресс
+                    setTimeout(() => {
+                        progressContainer.style.display = 'none';
+                    }, 3000);
+                } else if (percent === -1) {
+                    progressStatus.textContent = '❌ Ошибка загрузки';
+                    progressText.textContent = '❌';
+                    currentGifName.textContent = 'Попробуйте снова';
+                } else {
+                    const current = Math.round((percent / 100) * total);
+                    progressText.textContent = `${Math.min(current, total)} / ${total}`;
+                    progressStatus.textContent = data.status || 'Загрузка GIF...';
+                    if (data.currentGif) {
+                        currentGifName.textContent = `📥 ${data.currentGif}`;
+                    }
+                }
+            });
         };
 
                 // Настройка поиска

@@ -304,24 +304,27 @@ function getGifPath(gifId) {
 function saveGif(gifId, url) {
     return new Promise((resolve) => {
         const gifPath = getGifPath(gifId);
+        console.log(`💾 Сохранение GIF: ${gifId} -> ${gifPath}`);
+        console.log(`📡 URL: ${url}`);
+        
         if (url.startsWith('http')) {
-            // Загрузка из интернета
             const axios = require('axios');
             axios.get(url, { responseType: 'arraybuffer' })
                 .then(response => {
                     fs.writeFileSync(gifPath, response.data);
+                    console.log(`✅ GIF сохранен: ${gifId}`);
                     resolve(true);
                 })
                 .catch(error => {
-                    console.error('Error downloading GIF:', error);
+                    console.error(`❌ Error downloading GIF ${gifId}:`, error.message);
                     resolve(false);
                 });
         } else if (url.startsWith('file://')) {
-            // Копирование локального файла
             const sourcePath = url.substring(7);
             fs.copyFileSync(sourcePath, gifPath);
             resolve(true);
         } else {
+            console.error(`❌ Неизвестный URL: ${url}`);
             resolve(false);
         }
     });

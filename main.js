@@ -630,7 +630,6 @@ ipcMain.handle('apply-content-update', async () => {
         console.log('Applying content update...');
         const result = await contentUpdater.applyContentUpdate();
         if (result) {
-            // Отправляем уведомление во все окна
             BrowserWindow.getAllWindows().forEach(win => {
                 win.webContents.send('data-updated');
             });
