@@ -179,74 +179,86 @@
             display: block;
         }
 
-        /* Стили для выпадающего меню категорий для перемещения и копирования */
+/* Стили для выпадающих списков категорий */
+.category-dropdown {
+    display: none;
+    position: absolute;
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    min-width: 200px;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    z-index: 99999;
+    border-radius: 10px;
+    border: 1px solid rgba(67, 97, 238, 0.3);
+    padding: 6px 0;
+    left: 0;
+    top: 100%;
+    margin-top: 4px;
+    backdrop-filter: blur(10px);
+}
 
-        .category-dropdown {
-            display: none;
-            position: absolute;
-            background-color: rgba(0, 0, 0, 0.9);
-            min-width: 200px;
-            max-height: 300px;
-            overflow-y: auto;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            z-index: 1;
-            border-radius: 8px;
-            border: 1px solid var(--primary);
-            padding: 10px 0;
-        }
+.category-dropdown button {
+    color: #e0e0e0;
+    padding: 10px 18px;
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
 
-        .category-dropdown button {
-            color: white;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
+.category-dropdown button:hover {
+    background-color: rgba(67, 97, 238, 0.2);
+    border-left-color: var(--primary);
+    color: white;
+}
 
-        .category-dropdown-btn:hover {
-            border-color: var(--success);
-        }
+.category-dropdown-container {
+    position: relative;
+    flex-grow: 1;
+}
 
-        .category-dropdown-container {
-            flex-grow: 1;
-            position: relative;
-        }
+.category-dropdown-btn {
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    border: 1px solid var(--primary);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    padding-right: 25px;
+    transition: all 0.2s;
+    backdrop-filter: blur(5px);
+}
 
-        .category-dropdown-btn {
-            width: 100%;
-            padding: 6px 10px;
-            /* Уменьшенные отступы */
-            font-size: 13px;
-            border-radius: 5px;
-            border: 1px solid var(--primary);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            text-align: left;
-            cursor: pointer;
-            position: relative;
-            padding-right: 25px;
-            transition: all 0.2s;
-        }
+.category-dropdown-btn::after {
+    content: "▼";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
 
-        .category-dropdown-btn::after {
-            content: "▼";
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 9px;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
+.category-dropdown-btn:hover {
+    border-color: var(--success);
+    background-color: rgba(67, 97, 238, 0.2);
+    box-shadow: 0 0 15px rgba(67, 97, 238, 0.2);
+}
 
-        .category-dropdown-btn:hover::after {
-            opacity: 1;
-        }
+.category-dropdown-btn:hover::after {
+    opacity: 1;
+}
 
         .move-container,
         .copy-container {
@@ -268,6 +280,8 @@
             text-align: left;
             /* Выравнивание по левому краю */
             flex-shrink: 0;
+            margin-left: -120px;
+
         }
 
         .action-controls {
@@ -1136,19 +1150,28 @@
         .modal-content::-webkit-scrollbar,
         .category-dropdown::-webkit-scrollbar,
         .data-actions-dropdown::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         .modal-content::-webkit-scrollbar-track,
         .category-dropdown::-webkit-scrollbar-track,
         .data-actions-dropdown::-webkit-scrollbar-track {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
         }
 
         .modal-content::-webkit-scrollbar-thumb,
         .category-dropdown::-webkit-scrollbar-thumb,
         .data-actions-dropdown::-webkit-scrollbar-thumb {
-            background-color: var(--success);
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover,
+        .category-dropdown::-webkit-scrollbar-thumb:hover,
+        .data-actions-dropdown::-webkit-scrollbar-thumb:hover {
+            background-color: var(--secondary);
         }
 
         .modal-content {
@@ -1534,6 +1557,392 @@
             border-radius: 12px;
             font-size: 12px;
         }
+
+        /* Стили для системной категории */
+        .category-btn.system-category {
+            border: 2px solid #6c5ce7 !important;
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .category-btn.system-category:hover {
+            box-shadow: 0 0 25px rgba(108, 92, 231, 0.5);
+        }
+
+        /* Иконка замка для системной категории */
+        .category-btn.system-category::after {
+            content: ' 🔒';
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Стиль для элементов в системной категории - КОМПАКТНЫЙ */
+        .item-container.system-item {
+            border-color: #6c5ce7 !important;
+            background: rgba(108, 92, 231, 0.05);
+            position: relative;
+            grid-template-columns: 1fr 140px !important;  /* Уменьшаем правую колонку */
+            padding: 10px 12px !important;  /* Уменьшаем отступы */
+            gap: 8px !important;
+            min-height: 100px !important;
+            align-items: center !important;
+        }
+
+        /* Иконка замка на карточке системного GIF */
+        .item-container.system-item::before {
+            content: '🔒';
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 12px;
+            opacity: 0.4;
+            z-index: 5;
+        }
+
+        /* Код в системной категории - компактно */
+        .item-container.system-item .item-code {
+            font-size: 16px;
+            color: #a29bfe;
+            text-shadow: 0 0 10px rgba(108, 92, 231, 0.2);
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* GIF контейнер в системной категории - меньше */
+        .item-container.system-item .gif-container {
+            width: 120px !important;
+            height: 90px !important;
+            border-radius: 8px !important;
+        }
+
+        .item-container.system-item .gif-container img {
+            object-fit: contain !important;
+        }
+
+        /* Управление в системной категории - компактно */
+        .item-container.system-item .gif-controls {
+            padding-left: 0 !important;
+            margin-left: -10px !important;  /* Сдвигаем влево */
+        }
+
+        .item-container.system-item .action-container {
+            padding-left: 0 !important;
+            margin-left: -10px !important;  /* Сдвигаем влево */
+        }
+
+        /* Сдвинуть Копировать: и кнопку влево в системной категории */
+        .item-container.system-item .action-row {
+            margin-left: -20px !important;
+        }
+
+        /* Метка "Копировать:" - компактно */
+        .item-container.system-item .action-label {
+            font-size: 13px !important;
+            min-width: 70px !important;
+            color: #a29bfe !important;
+            font-weight: 400 !important;
+        }
+
+        /* Кнопка выбора категории - компактно */
+        .item-container.system-item .category-dropdown-btn {
+            padding: 4px 12px !important;
+            padding-right: 22px !important;
+            font-size: 12px !important;
+            border-radius: 4px !important;
+            min-height: 28px !important;
+            min-width: 130px !important;  /* Увеличиваем минимальную ширину */
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe) !important;
+            border-color: #6c5ce7 !important;
+            color: white !important;
+            font-weight: 500 !important;
+            white-space: nowrap !important;
+            overflow: visible !important;  /* Меняем на visible */
+            text-overflow: clip !important;  /* Меняем на clip */
+        }
+
+        .item-container.system-item .category-dropdown-btn::after {
+            font-size: 8px !important;
+            right: 6px !important;
+        }
+
+        .item-container.system-item .category-dropdown-btn:hover {
+            background: linear-gradient(135deg, #5a4bd1, #8c7fe6) !important;
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.3) !important;
+        }
+
+        /* Выпадающий список - компактно */
+        .item-container.system-item .category-dropdown {
+            min-width: 160px !important;
+            max-height: 200px !important;
+            padding: 4px 0 !important;
+        }
+
+        .item-container.system-item .category-dropdown button {
+            padding: 6px 14px !important;
+            font-size: 12px !important;
+        }
+
+        /* Контейнер для кнопки - увеличиваем */
+        .item-container.system-item .category-dropdown-container {
+            min-width: 130px !important;  /* Увеличиваем */
+            max-width: 200px !important;
+            flex-shrink: 0 !important;  /* Запрещаем сжиматься */
+        }
+
+        /* Скрываем лишние элементы в системной категории */
+        .item-container.system-item .edit-controls {
+            display: none !important;
+        }
+
+        .item-container.system-item .gif-url-edit {
+            display: none !important;
+        }
+
+                /* Стили для поиска */
+        .search-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            padding: 15px 20px;
+            border: 1px solid var(--primary);
+            backdrop-filter: blur(5px);
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            font-size: 16px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 20px rgba(76, 201, 240, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .clear-search-btn:hover {
+            opacity: 1;
+        }
+
+        #searchResults {
+            margin-top: 15px;
+        }
+
+        #searchResultsGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        /* Стили для результатов поиска */
+        .search-result-item {
+            display: grid !important;
+            grid-template-columns: 1fr 160px !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 12px 15px !important;
+            background-color: rgba(108, 92, 231, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .search-result-item .item-code {
+            font-family: 'Courier New', Courier, monospace;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .search-result-item .gif-code-display {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .search-result-item .search-match {
+            font-size: 12px;
+            color: var(--success);
+        }
+
+        .search-result-item .gif-container {
+            width: 130px !important;
+            height: 90px !important;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #6c5ce7;
+        }
+
+        .search-result-item .gif-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Кнопка в результатах поиска */
+        .search-result-item .category-dropdown-container {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .search-result-item .category-dropdown-btn {
+            padding: 6px 12px !important;
+            padding-right: 170px !important;
+            font-size: 12px !important;
+            border-radius: 4px !important;
+            min-height: 28px !important;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe) !important;
+            border-color: #6c5ce7 !important;
+            color: white !important;
+            font-weight: 500 !important;
+            white-space: nowrap !important;
+            width: 100% !important;
+            text-align: center !important;
+            margin-left: -20px;
+        }
+
+        .search-result-item .category-dropdown-btn::after {
+            content: "▼" !important;
+            position: absolute !important;
+            right: 6px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            font-size: 8px !important;
+            opacity: 0.7 !important;
+        }
+
+        .search-result-item .category-dropdown-btn:hover {
+            background: linear-gradient(135deg, #5a4bd1, #8c7fe6) !important;
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.3) !important;
+        }
+
+        .search-result-item .category-dropdown {
+            min-width: 150px !important;
+            max-height: 200px !important;
+            border-color: #6c5ce7 !important;
+        }
+
+        .search-result-item .category-dropdown button {
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+        }
+
+        .search-result-item .category-dropdown button:hover {
+            background-color: rgba(108, 92, 231, 0.3) !important;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+            font-size: 18px;
+        }
+
+        /* Анимация появления результатов */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+/* Выпадающий список в поиске - ВПРАВО И ВВЕРХ */
+.search-result-item .category-dropdown-container {
+    flex: 1;
+    min-width: 100px;
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 99999 !important;
+}
+
+.search-result-item .category-dropdown {
+    display: none !important;
+    position: absolute !important;
+    left: 100% !important;      /* Вправо от кнопки */
+    bottom: 0 !important;       /* Привязан к нижнему краю кнопки */
+    min-width: 180px !important;
+    max-height: 250px !important;
+    overflow-y: auto !important;
+    background: rgba(10, 10, 30, 0.98) !important;
+    border: 2px solid #6c5ce7 !important;
+    border-radius: 10px !important;
+    padding: 6px 0 !important;
+    z-index: 9999999 !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9) !important;
+    backdrop-filter: blur(20px) !important;
+    margin-left: 6px !important;
+}
+
+.search-result-item .category-dropdown.show,
+.search-result-item .category-dropdown[style*="display: block"] {
+    display: block !important;
+}
+
+.search-result-item .category-dropdown button {
+    color: #e0e0e0 !important;
+    padding: 10px 18px !important;
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    background: none !important;
+    border: none !important;
+    border-left: 3px solid transparent !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    transition: all 0.2s !important;
+}
+
+.search-result-item .category-dropdown button:hover {
+    background: rgba(108, 92, 231, 0.25) !important;
+    border-left-color: #6c5ce7 !important;
+    color: white !important;
+}
+
+/* Убеждаемся, что родители не обрезают */
+#searchResults,
+#searchResultsGrid,
+.search-result-item,
+.search-result-item .gif-controls,
+.search-result-item .action-container {
+    overflow: visible !important;
+}
+        
     </style>
 </head>
 
@@ -1572,6 +1981,17 @@
                 <button id="exportBtn">Экспорт GIF</button>
                 <button id="importBtn">Импорт GIF</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Поиск в системной категории -->
+    <div class="search-container" id="systemSearchContainer" style="display: none; margin-bottom: 20px;">
+        <div class="search-wrapper">
+            <input type="text" id="systemSearchInput" placeholder="🔍 Поиск GIF по коду..." class="search-input">
+            <button id="clearSearchBtn" class="clear-search-btn" style="display: none;">✕</button>
+        </div>
+        <div id="searchResults" style="display: none; margin-top: 10px;">
+            <div id="searchResultsGrid" class="items-grid"></div>
         </div>
     </div>
 
@@ -1758,7 +2178,6 @@
         </div>
     </div>
 
-
     <script>
         const path = require('path');
         const { ipcRenderer } = require('electron');
@@ -1794,6 +2213,105 @@
             }
         };
 
+                // Функция для создания уведомления об обновлении контента
+        function createContentUpdateNotification() {
+            // Проверяем, существует ли уже уведомление
+            let container = document.getElementById('contentUpdateNotification');
+            if (container) {
+                container.style.display = 'block';
+                return container;
+            }
+            
+            container = document.createElement('div');
+            container.id = 'contentUpdateNotification';
+            container.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.95);
+                border: 2px solid var(--success);
+                border-radius: 12px;
+                padding: 30px;
+                z-index: 10000;
+                max-width: 400px;
+                text-align: center;
+                display: none;
+                box-shadow: 0 0 40px rgba(0,0,0,0.8);
+                backdrop-filter: blur(10px);
+            `;
+            container.innerHTML = `
+                <h3 style="color: var(--success); margin-top: 0;">✨ Новые GIF доступны!</h3>
+                <p>Доступно обновление контента с новыми GIF-изображениями.</p>
+                <p style="font-size: 14px; color: #888;">Версия: <span id="contentUpdateVersion"></span></p>
+                <p style="font-size: 14px; color: #888;">Новых GIF: <span id="contentUpdateCount"></span></p>
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                    <button id="applyContentUpdateBtn" class="confirm-btn">Обновить</button>
+                    <button id="dismissContentUpdateBtn" class="cancel-btn">Позже</button>
+                </div>
+            `;
+            document.body.appendChild(container);
+            
+            // Обработчик кнопки "Обновить"
+            document.getElementById('applyContentUpdateBtn').addEventListener('click', async () => {
+                try {
+                    const success = await ipcRenderer.invoke('apply-content-update');
+                    if (success) {
+                        showNotification('✅ Контент обновлен!');
+                        container.style.display = 'none';
+                        // Перезагружаем данные
+                        const data = await ipcRenderer.invoke('load-initial-data');
+                        categories = data.categories || [];
+                        itemsData = data.itemsData || {};
+                        await updateCategoryUI();
+                        if (categories.length > 0) {
+                            switchCategory(categories[0].key);
+                        }
+                    } else {
+                        showNotification('❌ Ошибка обновления контента', true);
+                    }
+                } catch (error) {
+                    console.error('Error applying content update:', error);
+                    showNotification('❌ Ошибка обновления контента', true);
+                }
+            });
+            
+            // Обработчик кнопки "Позже"
+            document.getElementById('dismissContentUpdateBtn').addEventListener('click', () => {
+                container.style.display = 'none';
+            });
+            
+            return container;
+        }
+
+        // Функция для показа уведомления о новом контенте
+        function showContentUpdateNotification(data) {
+            const notification = createContentUpdateNotification();
+            notification.style.display = 'block';
+            document.getElementById('contentUpdateVersion').textContent = data.version || '1.0.0';
+            document.getElementById('contentUpdateCount').textContent = data.count || 0;
+        }
+
+        // Проверка, является ли категория системной
+        function isSystemCategory(categoryId) {
+            return String(categoryId) === 'system_gifs';
+        }
+
+        // Проверка, можно ли редактировать категорию
+        function canEditCategory(category) {
+            return !category.isSystem;
+        }
+
+        // Проверка, можно ли удалить элемент из категории
+        function canDeleteFromCategory(categoryId) {
+            return !isSystemCategory(categoryId);
+        }
+
+        // Проверка, можно ли переместить элемент из категории
+        function canMoveFromCategory(categoryId) {
+            return !isSystemCategory(categoryId);
+        }
+
         // Функция для генерации уникального ID
         function generateId() {
             return Date.now();
@@ -1806,12 +2324,13 @@
 
         // Функция для получения данных категории по ID
         function getCategoryData(categoryId) {
-            return itemsData[categoryId] || [];
+            return itemsData[String(categoryId)] || [];
         }
 
         // Функция для получения категории по ID
         function getCategoryById(categoryId) {
-            return categories.find(c => c.id === categoryId);
+            const id = String(categoryId);
+            return categories.find(c => String(c.id) === id);
         }
 
         // Функция для копирования кода
@@ -1875,86 +2394,129 @@
                 categoryContainer.appendChild(gridContainer);
                 document.getElementById('listContainer').appendChild(categoryContainer);
             } else {
-                // Если контейнер уже есть, просто очищаем его
                 const gridContainer = document.getElementById(gridId);
                 if (gridContainer) {
                     gridContainer.innerHTML = '';
                 }
             }
 
-            // Добавляем элементы
             const gridContainer = document.getElementById(gridId);
+            if (!gridContainer) return;
+
+            const isSystem = category.isSystem || isSystemCategory(categoryId);
+            
+            // Получаем список других категорий для выпадающих списков
+            const otherCategories = categories.filter(c => c.id !== categoryId);
+            
             for (let index = 0; index < items.length; index++) {
                 const item = items[index];
                 const gifPath = await ipcRenderer.invoke('get-gif-path', item.gifId);
 
                 const itemElement = document.createElement('div');
                 itemElement.className = 'item-container';
+                if (isSystem) {
+                    itemElement.classList.add('system-item');
+                }
                 itemElement.style.borderColor = category.color;
 
+                let actionsHtml = '';
+                
+                if (isSystem) {
+                    // СИСТЕМНАЯ КАТЕГОРИЯ: только копирование - КОМПАКТНЫЙ ВИД
+                    let dropdownOptions = '';
+                    otherCategories.forEach(c => {
+                        dropdownOptions += `<button onclick="copyItem('${categoryId}', ${index}, '${c.id}')">${c.name}</button>`;
+                    });
+                    
+                    actionsHtml = `
+                        <div class="gif-controls">
+                            <div class="gif-edit-container">
+                                <div class="gif-container" style="border-color: ${category.color};">
+                                    <img src="${gifPath || ''}" alt="GIF" id="gif-${categoryId}-${index}">
+                                </div>
+                            </div>
+                            <div class="action-container">
+                                <div class="action-row">
+                                    <span class="action-label">📋 Копировать:</span>
+                                    <div class="category-dropdown-container">
+                                        <button class="category-dropdown-btn" onclick="toggleCategoryDropdown('copy', '${categoryId}', ${index})" style="background-color: ${category.color};">
+                                            Выбрать категорию
+                                        </button>
+                                        <div class="category-dropdown" id="copy-dropdown-${categoryId}-${index}">
+                                            ${dropdownOptions}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // ОБЫЧНАЯ КАТЕГОРИЯ: все функции без копирования
+                    // ИСКЛЮЧАЕМ СИСТЕМНУЮ КАТЕГОРИЮ из списка для перемещения
+                    let moveOptions = '';
+                    const availableCategories = otherCategories.filter(c => !isSystemCategory(c.id));
+                    availableCategories.forEach(c => {
+                        moveOptions += `<button onclick="moveItem('${categoryId}', ${index}, '${c.id}')">${c.name}</button>`;
+                    });
+                    
+                    actionsHtml = `
+                        <div class="gif-controls">
+                            <div class="gif-edit-container">
+                                <div class="gif-container" style="border-color: ${category.color}">
+                                    <img src="${gifPath || ''}" alt="GIF" id="gif-${categoryId}-${index}">
+                                </div>
+                                <input type="text" class="gif-url-edit" id="gif-url-edit-${categoryId}-${index}" value="" placeholder="URL новой гифки">
+                            </div>
+                            <div class="edit-controls">
+                                <button class="edit-btn" onclick="toggleEditMode('${categoryId}', ${index})" id="edit-btn-${categoryId}-${index}">Редактировать</button>
+                                <button class="edit-btn" onclick="saveEdits('${categoryId}', ${index})" id="save-btn-${categoryId}-${index}" style="display: none; background-color: var(--success)">Сохранить</button>
+                                <button class="edit-btn" onclick="cancelEdits('${categoryId}', ${index})" id="cancel-btn-${categoryId}-${index}" style="display: none; background-color: var(--danger)">Отмена</button>
+                            </div>
+                            <div class="action-container">
+                                <div class="action-row">
+                                    <span class="action-label">Переместить:</span>
+                                    <div class="category-dropdown-container">
+                                        <button class="category-dropdown-btn" onclick="toggleCategoryDropdown('move', '${categoryId}', ${index})">
+                                            Выбрать категорию
+                                        </button>
+                                        <div class="category-dropdown" id="move-dropdown-${categoryId}-${index}">
+                                            ${moveOptions}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const deleteBtn = isSystem ? '' : `<button class="gif-delete-btn" onclick="deleteItem('${categoryId}', ${index})"></button>`;
+                const editInput = isSystem ? '' : `<input type="text" id="code-edit-${categoryId}-${index}" value="${item.code}" style="display: none; width: 100%; padding: 5px; border-radius: 4px; border: 1px solid ${category.color}; background-color: rgba(0,0,0,0.5); color: white;">`;
+                const codeStyle = isSystem ? 'font-size: 18px;' : '';
+
                 itemElement.innerHTML = `
-    <button class="gif-delete-btn" onclick="deleteItem(${categoryId}, ${index})"></button>
-    <div class="item-code">
-        <button class="copy-btn" onclick="copyCode('${item.code}')" style="background-color: ${category.color}">Копировать</button>
-        <span id="code-display-${categoryId}-${index}">${item.code}</span>
-        <input type="text" id="code-edit-${categoryId}-${index}" value="${item.code}" style="display: none; width: 100%; padding: 5px; border-radius: 4px; border: 1px solid ${category.color}; background-color: rgba(0,0,0,0.5); color: white;">
-    </div>
-    <div class="gif-controls">
-        <div class="gif-edit-container">
-            <div class="gif-container" style="border-color: ${category.color}">
-                <img src="${gifPath || ''}" alt="GIF" id="gif-${categoryId}-${index}">
-            </div>
-            <input type="text" class="gif-url-edit" id="gif-url-edit-${categoryId}-${index}" value="" placeholder="URL новой гифки">
-        </div>
-        <div class="edit-controls">
-            <button class="edit-btn" onclick="toggleEditMode(${categoryId}, ${index})" id="edit-btn-${categoryId}-${index}">Редактировать</button>
-            <button class="edit-btn" onclick="saveEdits(${categoryId}, ${index})" id="save-btn-${categoryId}-${index}" style="display: none; background-color: var(--success)">Сохранить</button>
-            <button class="edit-btn" onclick="cancelEdits(${categoryId}, ${index})" id="cancel-btn-${categoryId}-${index}" style="display: none; background-color: var(--danger)">Отмена</button>
-        </div>
-<div class="action-container">
-    <div class="action-row">
-        <span class="action-label">Переместить:</span>
-        <div class="category-dropdown-container">
-            <button class="category-dropdown-btn" onclick="toggleCategoryDropdown('move', ${categoryId}, ${index})">
-                Выбрать категорию
-            </button>
-            <div class="category-dropdown" id="move-dropdown-${categoryId}-${index}">
-                ${categories.filter(c => c.id !== categoryId).map(c => `
-                    <button onclick="moveItem(${categoryId}, ${index}, ${c.id})">${c.name}</button>
-                `).join('')}
-            </div>
-        </div>
-    </div>
-    <div class="action-row">
-        <span class="action-label">Копировать:</span>
-        <div class="category-dropdown-container">
-            <button class="category-dropdown-btn" onclick="toggleCategoryDropdown('copy', ${categoryId}, ${index})">
-                Выбрать категорию
-            </button>
-            <div class="category-dropdown" id="copy-dropdown-${categoryId}-${index}">
-                ${categories.filter(c => c.id !== categoryId).map(c => `
-                    <button onclick="copyItem(${categoryId}, ${index}, ${c.id})">${c.name}</button>
-                `).join('')}
-            </div>
-        </div>
-    </div>
-</div>
-                </div>
-            `;
+                    ${deleteBtn}
+                    <div class="item-code">
+                        <span id="code-display-${categoryId}-${index}" style="${codeStyle}">${item.code}</span>
+                        ${editInput}
+                    </div>
+                    ${actionsHtml}
+                `;
+                
                 gridContainer.appendChild(itemElement);
             }
         }
 
-        // Генерация звезд
+                // Генерация звезд
         function createStars() {
             const starsContainer = document.getElementById('stars');
+            if (!starsContainer) return;
+            
             const starsCount = 200;
 
             for (let i = 0; i < starsCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
 
-                // Случайные параметры звезды
                 const size = Math.random() * 2;
                 const x = Math.random() * 100;
                 const y = Math.random() * 100;
@@ -1975,13 +2537,43 @@
         // Генерация светящихся линий
         function createGlowingLines() {
             const background = document.querySelector('.space-background');
+            if (!background) return;
+            
             const linesCount = 15;
 
             for (let i = 0; i < linesCount; i++) {
                 const line = document.createElement('div');
                 line.className = 'glowing-line';
 
-                // Случайные параметры линии
+                const width = 50 + Math.random() * 150;
+                const height = 1 + Math.random() * 2;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const angle = -30 + Math.random() * 60;
+                const duration = 10 + Math.random() * 20 + 's';
+                const delay = Math.random() * 15 + 's';
+
+                line.style.width = `${width}px`;
+                line.style.height = `${height}px`;
+                line.style.left = `${x}%`;
+                line.style.top = `${y}%`;
+                line.style.transform = `rotate(${angle}deg)`;
+                line.style.animationDuration = duration;
+                line.style.animationDelay = delay;
+
+                background.appendChild(line);
+            }
+        }
+
+        // Генерация светящихся линий
+        function createGlowingLines() {
+            const background = document.querySelector('.space-background');
+            const linesCount = 15;
+
+            for (let i = 0; i < linesCount; i++) {
+                const line = document.createElement('div');
+                line.className = 'glowing-line';
+
                 const width = 50 + Math.random() * 150;
                 const height = 1 + Math.random() * 2;
                 const x = Math.random() * 100;
@@ -2025,10 +2617,25 @@
                 btn.dataset.category = category.key;
                 btn.style.backgroundColor = category.color;
 
+                const isSystem = category.isSystem || isSystemCategory(category.id);
+
+                // Для системной категории добавляем специальный класс и тултип
+                if (isSystem) {
+                    btn.classList.add('system-category');
+                    btn.title = 'Системная категория (нельзя изменить)';
+                    btn.style.opacity = '0.9';
+                    btn.style.border = '2px solid #6c5ce7';
+                }
+
                 const menuTrigger = document.createElement('button');
                 menuTrigger.className = 'category-menu-trigger';
                 menuTrigger.innerHTML = '⋮';
                 menuTrigger.title = 'Действия с категорией';
+
+                // Скрываем меню для системной категории
+                if (isSystem) {
+                    menuTrigger.style.display = 'none';
+                }
 
                 const dropdownMenu = document.createElement('div');
                 dropdownMenu.className = 'category-dropdown-menu';
@@ -2048,7 +2655,11 @@
                 editBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     dropdownMenu.style.display = 'none';
-                    openEditCategoryModal(category);
+                    if (!isSystem) {
+                        openEditCategoryModal(category);
+                    } else {
+                        showNotification('Системную категорию нельзя редактировать!', true);
+                    }
                 });
 
                 const deleteBtn = document.createElement('button');
@@ -2057,7 +2668,11 @@
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     dropdownMenu.style.display = 'none';
-                    deleteCategory(category.id);
+                    if (!isSystem) {
+                        deleteCategory(category.id);
+                    } else {
+                        showNotification('Системную категорию нельзя удалить!', true);
+                    }
                 });
 
                 dropdownMenu.appendChild(editBtn);
@@ -2081,6 +2696,7 @@
 
             updateGifPanel();
         }
+
         // Обновление выпадающего списка категорий
         function updateCategorySelect() {
             const categorySelect = document.getElementById('newCategory');
@@ -2097,6 +2713,12 @@
 
         // Функция для удаления категории
         async function deleteCategory(categoryId) {
+            // Проверяем, не системная ли категория
+            if (isSystemCategory(categoryId)) {
+                showNotification('Системную категорию нельзя удалить!', true);
+                return;
+            }
+
             const category = getCategoryById(categoryId);
             if (!category) return;
 
@@ -2169,6 +2791,12 @@
         }
 
         function openEditCategoryModal(category) {
+            // Проверяем, не системная ли категория
+            if (category.isSystem || isSystemCategory(category.id)) {
+                showNotification('Системную категорию нельзя редактировать!', true);
+                return;
+            }
+
             document.getElementById('editCategoryName').value = category.name;
             document.getElementById('editCategoryModal').dataset.categoryId = category.id;
             selectedColor = category.color;
@@ -2266,24 +2894,87 @@
         function toggleCategoryDropdown(type, categoryId, index) {
             const dropdownId = `${type}-dropdown-${categoryId}-${index}`;
             const dropdown = document.getElementById(dropdownId);
+            
+            if (!dropdown) {
+                console.error('Dropdown not found:', dropdownId);
+                return;
+            }
 
             // Закрываем все другие выпадающие меню
             document.querySelectorAll('.category-dropdown').forEach(d => {
-                if (d.id !== dropdownId) d.style.display = 'none';
+                if (d.id !== dropdownId) {
+                    d.style.display = 'none';
+                    d.classList.remove('show');
+                }
             });
 
-            // Переключаем текущее меню
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            const isVisible = dropdown.style.display === 'block';
+            
+            if (isVisible) {
+                dropdown.style.display = 'none';
+                dropdown.classList.remove('show');
+                return;
+            }
+            
+            // Проверяем, находится ли dropdown в поиске
+            const isInSearch = dropdown.closest('.search-result-item') !== null;
+            
+            if (isInSearch) {
+                // Для поиска - открываем ВПРАВО и ВВЕРХ (от нижнего края кнопки)
+                dropdown.style.position = 'absolute';
+                dropdown.style.left = '100%';
+                dropdown.style.bottom = '0';  // Вверх от нижнего края
+                dropdown.style.top = 'auto';
+                dropdown.style.marginLeft = '6px';
+            } else {
+                // Для обычных категорий - открываем вниз
+                dropdown.style.position = 'absolute';
+                dropdown.style.left = '0';
+                dropdown.style.top = '100%';
+                dropdown.style.bottom = 'auto';
+                dropdown.style.marginLeft = '0';
+            }
+            
+            dropdown.style.display = 'block';
+            dropdown.classList.add('show');
 
-            // Закрытие при клике вне меню
-            if (dropdown.style.display === 'block') {
-                const closeHandler = (e) => {
-                    if (!dropdown.contains(e.target) && e.target.className !== 'category-dropdown-btn') {
-                        dropdown.style.display = 'none';
-                        document.removeEventListener('click', closeHandler);
+            // Заполняем содержимое если пусто
+            if (dropdown.children.length === 0 || dropdown.children[0]?.textContent === 'Нет доступных категорий') {
+                const otherCategories = categories.filter(c => c.id !== categoryId);
+                let html = '';
+                if (otherCategories.length === 0) {
+                    html = '<button style="color: #888; cursor: default; text-align: center; padding: 12px;">Нет доступных категорий</button>';
+                } else {
+                    if (type === 'copy') {
+                        html = otherCategories.map(c => 
+                            `<button onclick="copyItem('${categoryId}', ${index}, '${c.id}'); closeDropdown('${dropdownId}')">${c.name}</button>`
+                        ).join('');
+                    } else if (type === 'move') {
+                        html = otherCategories.map(c => 
+                            `<button onclick="moveItem('${categoryId}', ${index}, '${c.id}'); closeDropdown('${dropdownId}')">${c.name}</button>`
+                        ).join('');
                     }
-                };
-                setTimeout(() => document.addEventListener('click', closeHandler), 0);
+                }
+                dropdown.innerHTML = html;
+            }
+
+            // Закрытие при клике вне
+            const closeHandler = (e) => {
+                if (!dropdown.contains(e.target) && !e.target.closest('.category-dropdown-btn')) {
+                    dropdown.style.display = 'none';
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeHandler);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', closeHandler), 150);
+        }
+
+        // Функция закрытия dropdown
+        function closeDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            if (dropdown) {
+                dropdown.style.display = 'none';
+                dropdown.classList.remove('show');
             }
         }
 
@@ -2357,13 +3048,35 @@
 
         // Функция для перемещения элемента между категориями
         async function moveItem(fromCategoryId, index, toCategoryId = null) {
+            console.log('moveItem called:', { fromCategoryId, index, toCategoryId });
+            
+            // Приводим ID к строке
+            fromCategoryId = String(fromCategoryId);
+            
+            // Запрещаем перемещение ИЗ системной категории
+            if (isSystemCategory(fromCategoryId)) {
+                showNotification('❌ Нельзя перемещать элементы из системной категории!', true);
+                return;
+            }
+
             if (!toCategoryId) {
                 const selectId = `move-select-${fromCategoryId}-${index}`;
-                toCategoryId = parseInt(document.getElementById(selectId).value);
+                toCategoryId = String(document.getElementById(selectId).value);
+            } else {
+                toCategoryId = String(toCategoryId);
+            }
+
+            // ЗАПРЕЩАЕМ перемещение В системную категорию
+            if (isSystemCategory(toCategoryId)) {
+                showNotification('❌ Нельзя перемещать элементы в системную категорию!', true);
+                return;
             }
 
             const toCategory = getCategoryById(toCategoryId);
-            if (!toCategory) return;
+            if (!toCategory) {
+                showNotification('❌ Категория не найдена!', true);
+                return;
+            }
 
             // Используем кастомное подтверждение
             const isConfirmed = await customConfirm(
@@ -2383,40 +3096,72 @@
 
             await saveAllData();
             await updateCategoryUI();
+            showNotification(`✅ Элемент перемещен в "${toCategory.name}"`);
         }
+        async function copyItem(fromCategoryId, index, toCategoryId) {
+            console.log('copyItem called:', { fromCategoryId, index, toCategoryId });
+            
+            // Приводим ID к строке
+            fromCategoryId = String(fromCategoryId);
+            toCategoryId = String(toCategoryId);
+            
+            // Разрешаем копирование ТОЛЬКО из системной категории
+            if (!isSystemCategory(fromCategoryId)) {
+                showNotification('❌ Копирование разрешено только из системной категории!', true);
+                return;
+            }
 
-        // Функция для копирования элемента в другую категорию
-        async function copyItem(fromCategoryId, index, toCategoryId = null) {
             if (!toCategoryId) {
-                const selectId = `copy-select-${fromCategoryId}-${index}`;
-                toCategoryId = parseInt(document.getElementById(selectId).value);
+                showNotification('❌ Выберите категорию для копирования!', true);
+                return;
             }
 
             const toCategory = getCategoryById(toCategoryId);
-            if (!toCategory) return;
+            if (!toCategory) {
+                console.log('Category not found:', toCategoryId);
+                console.log('Available categories:', categories.map(c => ({ id: c.id, name: c.name })));
+                showNotification('❌ Категория не найдена!', true);
+                return;
+            }
 
-            // Заменяем confirm на кастомное модальное окно
+            // Проверяем, не пытается ли пользователь скопировать в системную категорию
+            if (isSystemCategory(toCategoryId)) {
+                showNotification('❌ Нельзя копировать в системную категорию!', true);
+                return;
+            }
+
+            // Проверяем, есть ли элемент
+            const fromItems = itemsData[fromCategoryId];
+            if (!fromItems || !fromItems[index]) {
+                showNotification('❌ Элемент не найден!', true);
+                return;
+            }
+
+            const originalItem = fromItems[index];
+
+            // Проверяем, есть ли уже такой код в целевой категории
+            const toItems = itemsData[toCategoryId] || [];
+            if (toItems.some(item => item.code === originalItem.code)) {
+                showNotification(`❌ Элемент с кодом "${originalItem.code}" уже существует в категории "${toCategory.name}"!`, true);
+                return;
+            }
+
             const isConfirmed = await customConfirm(
-                `Скопировать элемент в категорию "${toCategory.name}"?`,
+                `Скопировать элемент "${originalItem.code}" в категорию "${toCategory.name}"?`,
                 'Подтвердите копирование'
             );
 
             if (!isConfirmed) return;
 
-            const originalItem = itemsData[fromCategoryId][index];
-
-            // Создаем новый gifId для копии
             const newGifId = `gif_${generateId()}`;
 
-            // Копируем сам файл
             const copySuccess = await ipcRenderer.invoke('copy-gif-file', {
                 fromGifId: originalItem.gifId,
                 toGifId: newGifId
             });
 
             if (!copySuccess) {
-                // Заменяем alert на кастомное уведомление
-                showNotification("Не удалось скопировать GIF файл!", true);
+                showNotification("❌ Не удалось скопировать GIF файл!", true);
                 return;
             }
 
@@ -2430,13 +3175,12 @@
 
             await saveAllData();
             await updateCategoryUI();
-            showNotification(`Элемент скопирован в "${toCategory.name}"`);
+            showNotification(`✅ Элемент скопирован в "${toCategory.name}"`);
 
-            // Возвращаем фокус
-            setTimeout(() => {
-                const input = document.getElementById('newCategoryName');
-                if (input) input.focus();
-            }, 50);
+            const dropdown = document.getElementById(`copy-dropdown-${fromCategoryId}-${index}`);
+            if (dropdown) {
+                dropdown.style.display = 'none';
+            }
         }
 
         // Функция для добавления нового элемента
@@ -2450,23 +3194,28 @@
                 return;
             }
 
-            const gifId = `gif_${generateId()}`; // Генерируем уникальный ID для гифки
+            // Проверяем дубликаты в системной категории
+            if (isSystemCategory(categoryId)) {
+                const systemItems = itemsData[categoryId] || [];
+                if (systemItems.some(item => item.code === code)) {
+                    showNotification('Такой код уже существует в системной категории!', true);
+                    return;
+                }
+            }
+
+            const gifId = `gif_${generateId()}`;
             const newItem = { code, gifId };
 
             if (!itemsData[categoryId]) itemsData[categoryId] = [];
             itemsData[categoryId].push(newItem);
 
-            // Сохраняем данные
             await saveAllData();
 
             if (gifUrl) {
                 await ipcRenderer.invoke('save-gif', { gifId, url: gifUrl });
             }
 
-            // Обновляем UI
             await updateCategoryUI();
-
-            // Очищаем поля формы
             document.getElementById('newCode').value = '';
             document.getElementById('newGifUrl').value = '';
         }
@@ -2512,6 +3261,12 @@
 
         // Функция для удаления элемента
         async function deleteItem(categoryId, index) {
+            // Запрещаем удаление из системной категории
+            if (isSystemCategory(categoryId)) {
+                showNotification('Нельзя удалять элементы из системной категории!', true);
+                return;
+            }
+
             const category = getCategoryById(categoryId);
             if (!category) return;
 
@@ -2545,7 +3300,6 @@
                 const input = document.getElementById('newGifUrl');
                 if (input) {
                     input.focus();
-                    // Дополнительная проверка (для Electron)
                     if (document.activeElement !== input) {
                         input.focus({ preventScroll: true });
                     }
@@ -2561,7 +3315,6 @@
                 gifs: await getAllGifs()
             };
 
-            // Сохраняем только данные, без полного обновления UI
             return await ipcRenderer.invoke('save-data', data);
         }
 
@@ -2586,9 +3339,9 @@
             }
         }
 
-                // Функция для отображения уведомления о новом импортированном элементе
+        // Функция для отображения уведомления о новом импортированном элементе
         function showImportItemNotification(item) {
-            console.log('Получено уведомление:', item); // Отладка
+            console.log('Получено уведомление:', item);
             
             const container = document.getElementById('importNotificationContainer');
             if (!container) {
@@ -2596,7 +3349,6 @@
                 return;
             }
             
-            // Проверяем, есть ли уже уведомление с таким GIF ID
             const existingNotifications = container.querySelectorAll('.import-notification');
             for (const notif of existingNotifications) {
                 if (notif.dataset.gifId === item.gifId) {
@@ -2609,7 +3361,6 @@
             notification.className = 'import-notification';
             notification.dataset.gifId = item.gifId;
             
-            // Создаем содержимое уведомления с проверкой наличия данных
             const categoryName = item.categoryName || 'Неизвестная категория';
             const code = item.code || 'Без кода';
             const gifSrc = item.gifPath || '';
@@ -2628,7 +3379,6 @@
             container.appendChild(notification);
             console.log('Уведомление добавлено в контейнер');
             
-            // Автоматически скрываем через 5 секунд
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.classList.add('fade-out');
@@ -2647,102 +3397,94 @@
             showImportItemNotification(item);
         });
 
-            // Функция для показа сводки об импорте
-            function showImportSummary(count) {
-                if (count === 0) return;
-                
-                const container = document.getElementById('importNotificationContainer');
-                
-                // Удаляем предыдущую сводку, если есть
-                const oldSummary = container.querySelector('.import-summary-notification');
-                if (oldSummary) oldSummary.remove();
-                
-                const summary = document.createElement('div');
-                summary.className = 'import-summary-notification';
-                summary.innerHTML = `
-                    <span class="import-summary-icon">🎉</span>
-                    <span class="import-summary-text">Импортировано новых элементов</span>
-                    <span class="import-summary-count">${count}</span>
-                `;
-                
-                container.insertBefore(summary, container.firstChild);
-                
-                // Автоматически скрываем через 7 секунд
-                setTimeout(() => {
-                    if (summary.parentElement) {
-                        summary.style.opacity = '0';
-                        summary.style.transition = 'opacity 0.3s';
-                        setTimeout(() => {
-                            if (summary.parentElement) {
-                                summary.remove();
-                            }
-                        }, 300);
-                    }
-                }, 7000);
-            }
-
-                        // Функция для отображения массового уведомления (при >10 новых элементов)
-            function showImportBulkNotification(data) {
-                const container = document.getElementById('importNotificationContainer');
-                if (!container) return;
-                
-                // Удаляем предыдущее массовое уведомление, если есть
-                const oldBulk = container.querySelector('.import-bulk-notification');
-                if (oldBulk) oldBulk.remove();
-                
-                const notification = document.createElement('div');
-                notification.className = 'import-bulk-notification';
-                
-                // Создаем список категорий
-                let categoriesHtml = '';
-                for (const [category, count] of Object.entries(data.categories)) {
-                    categoriesHtml += `
-                        <div class="import-bulk-category">
-                            <span class="import-bulk-category-name">📁 ${category}</span>
-                            <span class="import-bulk-category-count">+${count}</span>
-                        </div>
-                    `;
+        // Функция для показа сводки об импорте
+        function showImportSummary(count) {
+            if (count === 0) return;
+            
+            const container = document.getElementById('importNotificationContainer');
+            
+            const oldSummary = container.querySelector('.import-summary-notification');
+            if (oldSummary) oldSummary.remove();
+            
+            const summary = document.createElement('div');
+            summary.className = 'import-summary-notification';
+            summary.innerHTML = `
+                <span class="import-summary-icon">🎉</span>
+                <span class="import-summary-text">Импортировано новых элементов</span>
+                <span class="import-summary-count">${count}</span>
+            `;
+            
+            container.insertBefore(summary, container.firstChild);
+            
+            setTimeout(() => {
+                if (summary.parentElement) {
+                    summary.style.opacity = '0';
+                    summary.style.transition = 'opacity 0.3s';
+                    setTimeout(() => {
+                        if (summary.parentElement) {
+                            summary.remove();
+                        }
+                    }, 300);
                 }
-                
-                notification.innerHTML = `
-                    <div class="import-bulk-header">
-                        <span class="import-bulk-icon">📦</span>
-                        <span>Массовый импорт</span>
-                        <span class="import-bulk-count">${data.totalCount}</span>
-                    </div>
-                    <div class="import-bulk-categories">
-                        ${categoriesHtml}
-                    </div>
-                    <div style="margin-top: 10px; font-size: 12px; color: #aaccff; text-align: center;">
-                        Показано ${Object.keys(data.categories).length} категорий
-                    </div>
-                    <button class="import-notification-close" style="position: absolute; top: 10px; right: 10px;" 
-                            onclick="this.parentElement.classList.add('fade-out'); setTimeout(() => this.parentElement.remove(), 300)">×</button>
-                `;
-                
-                container.appendChild(notification);
-                
-                // Автоматически скрываем через 7 секунд
-                setTimeout(() => {
-                    if (notification.parentElement) {
-                        notification.classList.add('fade-out');
-                        setTimeout(() => {
-                            if (notification.parentElement) {
-                                notification.remove();
-                            }
-                        }, 300);
-                    }
-                }, 7000);
-            }
+            }, 7000);
+        }
 
-            // Добавляем обработчик для массовых уведомлений
-            ipcRenderer.on('show-import-bulk-notification', (event, data) => {
-                showImportBulkNotification(data);
-            });
+        // Функция для отображения массового уведомления
+        function showImportBulkNotification(data) {
+            const container = document.getElementById('importNotificationContainer');
+            if (!container) return;
+            
+            const oldBulk = container.querySelector('.import-bulk-notification');
+            if (oldBulk) oldBulk.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = 'import-bulk-notification';
+            
+            let categoriesHtml = '';
+            for (const [category, count] of Object.entries(data.categories)) {
+                categoriesHtml += `
+                    <div class="import-bulk-category">
+                        <span class="import-bulk-category-name">📁 ${category}</span>
+                        <span class="import-bulk-category-count">+${count}</span>
+                    </div>
+                `;
+            }
+            
+            notification.innerHTML = `
+                <div class="import-bulk-header">
+                    <span class="import-bulk-icon">📦</span>
+                    <span>Массовый импорт</span>
+                    <span class="import-bulk-count">${data.totalCount}</span>
+                </div>
+                <div class="import-bulk-categories">
+                    ${categoriesHtml}
+                </div>
+                <div style="margin-top: 10px; font-size: 12px; color: #aaccff; text-align: center;">
+                    Показано ${Object.keys(data.categories).length} категорий
+                </div>
+                <button class="import-notification-close" style="position: absolute; top: 10px; right: 10px;" 
+                        onclick="this.parentElement.classList.add('fade-out'); setTimeout(() => this.parentElement.remove(), 300)">×</button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 7000);
+        }
+
+        ipcRenderer.on('show-import-bulk-notification', (event, data) => {
+            showImportBulkNotification(data);
+        });
 
         // Функция импорта данных
-        let importInProgress = false;
-                // Функция импорта данных (ЗАМЕНИТЬ существующую)
         async function importData() {
             return new Promise((resolve) => {
                 const modal = document.getElementById('importConfirmModal');
@@ -2761,12 +3503,8 @@
                             showNotification(`Импорт завершен! Всего: ${totalItems} элементов`);
                             
                             if (result.newItems && result.newItems.length > 0) {
-                                // Показываем сводку
                                 showImportSummary(result.newItems.length);
-                                
-                                // Отправляем на обработку (main сам решит, как показывать)
                                 ipcRenderer.invoke('show-import-notifications', result.newItems);
-                                
                                 showNotification(`➕ Добавлено новых элементов: ${result.newItems.length}`);
                             } else {
                                 showNotification('Новых элементов не найдено (все уже существуют)');
@@ -2800,7 +3538,7 @@
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = `export-cat-${category.id}`;
-                checkbox.checked = true; // По умолчанию все выбраны
+                checkbox.checked = true;
 
                 const label = document.createElement('label');
                 label.htmlFor = `export-cat-${category.id}`;
@@ -2836,7 +3574,6 @@
                 return;
             }
 
-            // Подготавливаем данные
             const exportData = {
                 categories: categories.filter(cat => selectedCategories.includes(cat.id)),
                 itemsData: {},
@@ -2849,13 +3586,10 @@
                 }
             });
 
-            // Закрываем модалку выбора категорий
             closeModal('exportModal');
 
-            // Получаем информацию о выбранных данных
             const { data, gifCount } = await ipcRenderer.invoke('export-data', exportData);
 
-            // Теперь открываем диалог сохранения файла
             const { filePath } = await ipcRenderer.invoke('show-save-dialog', {
                 title: 'Сохранить экспортированные данные',
                 defaultPath: `gif_export_${new Date().toISOString().slice(0, 10)}.zip`,
@@ -2876,7 +3610,6 @@
 
         // Функция переключения категорий
         function switchCategory(categoryKey) {
-            // Обновляем активные кнопки
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.category === categoryKey) {
@@ -2884,7 +3617,6 @@
                 }
             });
 
-            // Обновляем активные категории
             document.querySelectorAll('.category').forEach(cat => {
                 cat.classList.remove('active');
                 if (cat.id === `${categoryKey}Category`) {
@@ -2895,8 +3627,16 @@
 
         // Функция для обновления GIF панели
         async function updateGifPanel() {
-            // Обновляем категории
+            // Проверяем, есть ли элементы панели на странице
             const panelCategories = document.getElementById('panelCategories');
+            const panelItemsGrid = document.getElementById('panelItemsGrid');
+            
+            // Если элементов нет - пропускаем (это страница Gifpage.html, а не GifPanel.html)
+            if (!panelCategories || !panelItemsGrid) {
+                console.log('GIF Panel elements not found on this page');
+                return;
+            }
+            
             panelCategories.innerHTML = '';
 
             categories.forEach((category, index) => {
@@ -2910,8 +3650,6 @@
                     btn.classList.add('active');
                 }
 
-
-                // Обработчик клика по категории
                 btn.addEventListener('click', (e) => {
                     if (panelState.isDraggingCategory || e.target.classList.contains('drag-handle')) {
                         return;
@@ -2920,7 +3658,6 @@
                     updateGifPanel();
                 });
 
-                // Обработчики для перетаскивания категорий
                 btn.addEventListener('mousedown', startCategoryDrag);
 
                 panelCategories.appendChild(btn);
@@ -2930,8 +3667,6 @@
                 panelState.currentCategory = categories[0].id;
             }
 
-            // Обновляем элементы
-            const panelItemsGrid = document.getElementById('panelItemsGrid');
             panelItemsGrid.innerHTML = '';
 
             if (!panelState.currentCategory) return;
@@ -2966,21 +3701,16 @@
             }
         }
 
-
-
         // Улучшенный код для работы с цветовым колесом
         function setupColorWheel() {
             const canvas = document.getElementById('colorPalette');
             const ctx = canvas.getContext('2d');
             const selector = document.getElementById('paletteSelector');
             const preview = document.getElementById('colorPreview');
-            const value = preview.querySelector('.color-value');
 
-            // Рисуем квадратную палитру
             function drawPalette() {
                 const width = canvas.width;
                 const height = canvas.height;
-                // Градиент по горизонтали (цветовой тон)
                 const hGrad = ctx.createLinearGradient(0, 0, width, 0);
                 hGrad.addColorStop(0, 'red');
                 hGrad.addColorStop(0.17, 'yellow');
@@ -2992,7 +3722,6 @@
                 ctx.fillStyle = hGrad;
                 ctx.fillRect(0, 0, width, height);
 
-                // Градиент по вертикали (яркость)
                 const vGrad = ctx.createLinearGradient(0, 0, 0, height);
                 vGrad.addColorStop(0, 'rgba(255,255,255,1)');
                 vGrad.addColorStop(0.5, 'rgba(255,255,255,0)');
@@ -3005,7 +3734,6 @@
             drawPalette();
 
             let isDown = false;
-            let currentColor = '#4361ee';
 
             function getColor(x, y) {
                 const data = ctx.getImageData(x, y, 1, 1).data;
@@ -3041,30 +3769,24 @@
                 isDown = false;
             });
 
-            // Утилита для HEX
             function rgbToHex(r, g, b) {
                 return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
             }
 
-            // Инициализация
             update(100, 100);
         }
 
-
-        // Дополнительные функции для работы с цветом
         function hexToHsl(hex) {
-            // Конвертация HEX в RGB
             const r = parseInt(hex.substring(1, 3), 16) / 255;
             const g = parseInt(hex.substring(3, 5), 16) / 255;
             const b = parseInt(hex.substring(5, 7), 16) / 255;
 
-            // Конвертация RGB в HSL
             const max = Math.max(r, g, b);
             const min = Math.min(r, g, b);
             let h, s, l = (max + min) / 2;
 
             if (max === min) {
-                h = s = 0; // achromatic
+                h = s = 0;
             } else {
                 const d = max - min;
                 s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -3079,32 +3801,6 @@
             return { h, s, l };
         }
 
-        function hslToRgb(h, s, l) {
-            let r, g, b;
-
-            if (s === 0) {
-                r = g = b = l;
-            } else {
-                const hue2rgb = (p, q, t) => {
-                    if (t < 0) t += 1;
-                    if (t > 1) t -= 1;
-                    if (t < 1 / 6) return p + (q - p) * 6 * t;
-                    if (t < 1 / 2) return q;
-                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-                    return p;
-                };
-
-                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                const p = 2 * l - q;
-
-                r = hue2rgb(p, q, h + 1 / 3);
-                g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1 / 3);
-            }
-
-            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-        }
-
         function rgbToHex(r, g, b) {
             return '#' + [r, g, b].map(x => {
                 const hex = x.toString(16).padStart(2, '0');
@@ -3115,7 +3811,6 @@
         // Функции для работы с модальными окнами
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
-            // Обновляем данные в модальном окне при открытии
             if (modalId === 'addGifModal') {
                 updateCategorySelect();
             }
@@ -3123,7 +3818,6 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-            // Очищаем поля при закрытии
             if (modalId === 'addGifModal') {
                 document.getElementById('newCode').value = '';
                 document.getElementById('newGifUrl').value = '';
@@ -3155,7 +3849,6 @@
             const saveBtn = document.getElementById(`save-btn-${categoryId}-${index}`);
             const cancelBtn = document.getElementById(`cancel-btn-${categoryId}-${index}`);
 
-            // Переключаем видимость элементов
             const isEditing = displayElement.style.display === 'none';
             displayElement.style.display = isEditing ? 'inline' : 'none';
             editElement.style.display = isEditing ? 'none' : 'block';
@@ -3164,7 +3857,6 @@
             saveBtn.style.display = isEditing ? 'none' : 'inline-block';
             cancelBtn.style.display = isEditing ? 'none' : 'inline-block';
 
-            // Если включаем редактирование, загружаем URL гифки
             if (!isEditing) {
                 loadGifUrl(categoryId, index);
             }
@@ -3196,15 +3888,12 @@
                 return;
             }
 
-            // Обновляем код
             itemsData[categoryId][index].code = newCode;
 
-            // Если URL изменился, обновляем гифку
             if (newUrl) {
                 const gifId = itemsData[categoryId][index].gifId;
                 const gifElement = document.getElementById(`gif-${categoryId}-${index}`);
 
-                // Показываем индикатор загрузки
                 gifElement.src = '';
                 gifElement.style.backgroundColor = '#333';
 
@@ -3216,7 +3905,6 @@
 
                     if (!success) {
                         showNotification('Не удалось обновить гифку', true);
-                        // Восстанавливаем старую гифку
                         const oldPath = await ipcRenderer.invoke('get-gif-path', gifId);
                         if (oldPath) gifElement.src = oldPath;
                     }
@@ -3226,24 +3914,16 @@
                 }
             }
 
-            // Сохраняем изменения
             await saveAllData();
-
-            // Выходим из режима редактирования
             toggleEditMode(categoryId, index);
-
-            // Обновляем отображение кода
             document.getElementById(`code-display-${categoryId}-${index}`).textContent = newCode;
         }
+
         // Функция для отмены изменений
         function cancelEdits(categoryId, index) {
             const item = itemsData[categoryId][index];
             const editElement = document.getElementById(`code-edit-${categoryId}-${index}`);
-
-            // Восстанавливаем исходное значение
             editElement.value = item.code;
-
-            // Выходим из режима редактирования
             toggleEditMode(categoryId, index);
         }
 
@@ -3258,16 +3938,13 @@
                 categories = data.categories || [];
                 itemsData = data.itemsData || {};
             } else {
-                // Если data не передана, загружаем данные заново
                 const loadedData = await ipcRenderer.invoke('load-initial-data');
                 categories = loadedData.categories || [];
                 itemsData = loadedData.itemsData || {};
             }
 
-            // Обновляем UI
             await updateCategoryUI();
 
-            // Если есть активная категория, переключаемся на нее
             if (categories.length > 0) {
                 const activeCategory = document.querySelector('.category-btn.active');
                 if (activeCategory) {
@@ -3283,13 +3960,10 @@
             ipcRenderer.on('update-available', (event, info) => {
                 document.getElementById('updateStatus').textContent = `Доступна версия ${info.version}`;
 
-                // Форматируем описание обновления
                 let releaseNotes = info.releaseNotes || 'Нет описания изменений';
                 if (typeof releaseNotes === 'string') {
-                    // Если это строка, преобразуем Markdown в HTML
                     releaseNotes = simpleMarkdownToHTML(releaseNotes);
                 } else if (Array.isArray(releaseNotes)) {
-                    // Если это массив (например, из GitHub), преобразуем в HTML
                     releaseNotes = releaseNotes.map(note => {
                         return `<div class="release-note">${simpleMarkdownToHTML(note)}</div>`;
                     }).join('');
@@ -3328,7 +4002,6 @@
                 document.getElementById('installUpdateBtn').style.display = 'none';
             });
 
-            // Обработчики кнопок
             document.getElementById('downloadUpdateBtn').addEventListener('click', () => {
                 ipcRenderer.send('download-update');
                 document.getElementById('downloadUpdateBtn').style.display = 'none';
@@ -3340,7 +4013,6 @@
 
             document.getElementById('remindLaterBtn').addEventListener('click', () => {
                 closeModal('updateModal');
-                // Проверим снова через 24 часа
                 setTimeout(() => {
                     ipcRenderer.send('check-for-updates');
                 }, 24 * 60 * 60 * 1000);
@@ -3350,36 +4022,28 @@
         function simpleMarkdownToHTML(text) {
             if (!text) return '';
 
-            // Заголовки
             text = text.replace(/^# (.*$)/gm, '<h3>$1</h3>');
             text = text.replace(/^## (.*$)/gm, '<h4>$1</h4>');
             text = text.replace(/^### (.*$)/gm, '<h5>$1</h5>');
 
-            // Списки
             text = text.replace(/^\* (.*$)/gm, '<li>$1</li>');
             text = text.replace(/^- (.*$)/gm, '<li>$1</li>');
             text = text.replace(/^\+ (.*$)/gm, '<li>$1</li>');
 
-            // Группируем элементы списка
             text = text.replace(/(<li>.*<\/li>)+/g, function (match) {
                 return '<ul>' + match + '</ul>';
             });
 
-            // Жирный текст
             text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             text = text.replace(/__(.*?)__/g, '<strong>$1</strong>');
 
-            // Курсив
             text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
             text = text.replace(/_(.*?)_/g, '<em>$1</em>');
 
-            // Код
             text = text.replace(/`(.*?)`/g, '<code>$1</code>');
 
-            // Ссылки
             text = text.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-            // Переносы строк
             text = text.replace(/\n\n/g, '</p><p>');
             text = text.replace(/\n/g, '<br>');
 
@@ -3391,9 +4055,7 @@
         });
 
         ipcRenderer.on('gif-updated', (event, { gifId, newPath }) => {
-            // Находим все элементы с этой гифкой
             document.querySelectorAll(`img[src*="${gifId}"]`).forEach(img => {
-                // Форсируем обновление
                 img.src = '';
                 setTimeout(() => {
                     img.src = newPath;
@@ -3401,74 +4063,292 @@
             });
         });
 
+                // Заглушка для drag-n-drop (если функция не определена)
+        function startCategoryDrag(e) {
+            // Функция для перетаскивания категорий в GIF панели
+            const btn = e.currentTarget;
+            panelState.isDraggingCategory = true;
+            panelState.draggedCategoryIndex = parseInt(btn.dataset.index);
+            btn.classList.add('dragging');
+        }
+
+                // ===== ПОИСК В СИСТЕМНОЙ КАТЕГОРИИ =====
+        let searchTimeout = null;
+
+        // Проверка, находимся ли мы в системной категории
+        function isSystemCategoryActive() {
+            const activeCategory = document.querySelector('.category-btn.active');
+            return activeCategory && activeCategory.dataset.category === 'system-gifs';
+        }
+
+        // Показать/скрыть поиск
+        function toggleSearchVisibility() {
+            const searchContainer = document.getElementById('systemSearchContainer');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (isSystemCategoryActive()) {
+                searchContainer.style.display = 'block';
+                // Скрываем результаты при переключении категории
+                searchResults.style.display = 'none';
+                document.getElementById('systemSearchInput').value = '';
+                document.getElementById('clearSearchBtn').style.display = 'none';
+            } else {
+                searchContainer.style.display = 'none';
+                searchResults.style.display = 'none';
+            }
+        }
+
+        // Поиск GIF в системной категории
+        async function searchSystemGifs(query) {
+            const resultsContainer = document.getElementById('searchResults');
+            const resultsGrid = document.getElementById('searchResultsGrid');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            query = query.trim().toLowerCase();
+            
+            if (!query) {
+                resultsContainer.style.display = 'none';
+                clearBtn.style.display = 'none';
+                return;
+            }
+            
+            clearBtn.style.display = 'block';
+            
+            const systemItems = itemsData['system_gifs'] || [];
+            const results = systemItems.filter(item => 
+                item.code.toLowerCase().includes(query)
+            );
+            
+            resultsGrid.innerHTML = '';
+            
+            if (results.length === 0) {
+                resultsGrid.innerHTML = `<div class="no-results">😕 Ничего не найдено для "<strong>${query}</strong>"</div>`;
+                resultsContainer.style.display = 'block';
+                return;
+            }
+            
+            resultsContainer.style.display = 'block';
+            
+            const systemItemsFull = itemsData['system_gifs'] || [];
+            
+            for (const item of results) {
+                const gifPath = await ipcRenderer.invoke('get-gif-path', item.gifId);
+                
+                const realIndex = systemItemsFull.findIndex(i => i.gifId === item.gifId);
+                const categoryId = 'system_gifs';
+                
+                const resultElement = document.createElement('div');
+                resultElement.className = 'search-result-item';
+                
+                const code = item.code;
+                const index = code.toLowerCase().indexOf(query);
+                let displayCode = code;
+                if (index !== -1) {
+                    const before = code.substring(0, index);
+                    const match = code.substring(index, index + query.length);
+                    const after = code.substring(index + query.length);
+                    displayCode = `${before}<span style="background: #6c5ce7; color: white; padding: 0 4px; border-radius: 3px;">${match}</span>${after}`;
+                }
+                
+                // Создаем выпадающий список категорий для копирования
+                let dropdownOptions = '';
+                const otherCategories = categories.filter(c => c.id !== categoryId);
+                otherCategories.forEach(c => {
+                    dropdownOptions += `<button onclick="copyItem('${categoryId}', ${realIndex}, '${c.id}')">${c.name}</button>`;
+                });
+                
+                resultElement.innerHTML = `
+                    <div class="item-code">
+                        <div class="gif-code-display">
+                            <span>${displayCode}</span>
+                            <div class="search-match">🔍 Найдено в системной категории</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div class="gif-container" style="border-color: #6c5ce7;">
+                            <img src="${gifPath || ''}" alt="GIF">
+                        </div>
+                        <div style="display: flex; width: 100%;">
+                            <div class="category-dropdown-container" style="flex: 1;">
+                                <button class="category-dropdown-btn" onclick="toggleCategoryDropdown('copy', '${categoryId}', ${realIndex})" style="background-color: #6c5ce7; padding: 6px 12px; font-size: 12px; min-height: 28px; width: 100%;">
+                                    📋 Копировать в категорию
+                                </button>
+                                <div class="category-dropdown" id="copy-dropdown-${categoryId}-${realIndex}">
+                                    ${dropdownOptions}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                resultsGrid.appendChild(resultElement);
+            }
+        }
+
+        // Обработчик ввода в поиске
+        function setupSearch() {
+            const searchInput = document.getElementById('systemSearchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            if (!searchInput) return;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchSystemGifs(this.value);
+                }, 300);
+            });
+            
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    document.getElementById('searchResults').style.display = 'none';
+                    clearBtn.style.display = 'none';
+                }
+            });
+            
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                document.getElementById('searchResults').style.display = 'none';
+                this.style.display = 'none';
+                searchInput.focus();
+            });
+        }
+
+        // Обновляем функцию switchCategory, чтобы показывать/скрывать поиск
+        const originalSwitchCategory = switchCategory;
+        switchCategory = function(categoryKey) {
+            originalSwitchCategory(categoryKey);
+            setTimeout(() => {
+                toggleSearchVisibility();
+                // Если переключились на системную - фокус на поиск
+                if (categoryKey === 'system-gifs') {
+                    const searchInput = document.getElementById('systemSearchInput');
+                    if (searchInput) {
+                        setTimeout(() => searchInput.focus(), 100);
+                    }
+                }
+            }, 50);
+        };
+
+                // Горячая клавиша для поиска (Ctrl+F)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                // Проверяем, активна ли системная категория
+                if (isSystemCategoryActive()) {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('systemSearchInput');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.select();
+                    }
+                }
+            }
+        });
+        
+
         // Инициализация при загрузке страницы
         window.onload = async function () {
-            // Создаем звезды и линии
-            createStars();
-            createGlowingLines()
-            // Загружаем начальные данные
+            // Проверяем наличие функций перед вызовом
+            if (typeof createStars === 'function') {
+                createStars();
+            } else {
+                console.warn('createStars function not found');
+            }
+            
+            if (typeof createGlowingLines === 'function') {
+                createGlowingLines();
+            } else {
+                console.warn('createGlowingLines function not found');
+            }
+            
             const initialData = await ipcRenderer.invoke('load-initial-data');
             if (initialData) {
                 categories = initialData.categories || [];
                 itemsData = initialData.itemsData || {};
             }
 
-            // Инициализируем UI
             await updateCategoryUI();
 
-            // Переключаемся на первую категорию
             if (categories.length > 0) {
                 switchCategory(categories[0].key);
             }
 
-            // Добавляем инициализацию автообновления
             setupAutoUpdater();
-
-            // Проверяем обновления при запуске
             ipcRenderer.send('check-for-updates');
-
-            // Инициализируем цветовое колесо
             setupColorWheel();
 
-            document.getElementById('toggleGifPanelBtn').addEventListener('click', toggleGifPanel);
-            updatePanelButton(); // Инициализация текста кнопки
+            // ===== ОСНОВНЫЕ КНОПКИ (с проверкой существования) =====
+            const toggleGifPanelBtn = document.getElementById('toggleGifPanelBtn');
+            if (toggleGifPanelBtn) {
+                toggleGifPanelBtn.addEventListener('click', toggleGifPanel);
+            }
+            updatePanelButton();
 
-            // Обработчики кнопок
+            const checkUpdatesBtn = document.getElementById('checkUpdatesBtn');
+            if (checkUpdatesBtn) {
+                checkUpdatesBtn.addEventListener('click', () => {
+                    ipcRenderer.send('check-for-updates');
+                    showNotification('Проверка обновлений...');
+                });
+            }
+            
+            const openAddGifModal = document.getElementById('openAddGifModal');
+            if (openAddGifModal) {
+                openAddGifModal.addEventListener('click', () => openModal('addGifModal'));
+            }
+            
+            const openAddCategoryModal = document.getElementById('openAddCategoryModal');
+            if (openAddCategoryModal) {
+                openAddCategoryModal.addEventListener('click', () => openModal('addCategoryModal'));
+            }
+            
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', openExportModal);
+            }
+            
+            const importBtn = document.getElementById('importBtn');
+            if (importBtn) {
+                importBtn.addEventListener('click', importData);
+            }
+            
+            const saveCategoryBtn = document.getElementById('saveCategoryBtn');
+            if (saveCategoryBtn) {
+                saveCategoryBtn.addEventListener('click', saveCategoryChanges);
+            }
+            
+            const confirmExportBtn = document.getElementById('confirmExportBtn');
+            if (confirmExportBtn) {
+                confirmExportBtn.addEventListener('click', exportSelectedCategories);
+            }
 
-            // Обработчик кнопки проверки обновлений
-            document.getElementById('checkUpdatesBtn').addEventListener('click', () => {
-                ipcRenderer.send('check-for-updates');
-                showNotification('Проверка обновлений...');
-            });
-            document.getElementById('openAddGifModal').addEventListener('click', () => openModal('addGifModal'));
-            document.getElementById('openAddCategoryModal').addEventListener('click', () => openModal('addCategoryModal'));
-            document.getElementById('exportBtn').addEventListener('click', exportData);
-            document.getElementById('importBtn').addEventListener('click', importData);
-            document.getElementById('saveCategoryBtn').addEventListener('click', saveCategoryChanges);
-            document.getElementById('exportBtn').addEventListener('click', openExportModal);
-            document.getElementById('confirmExportBtn').addEventListener('click', exportSelectedCategories);
+            const addNewBtn = document.getElementById('addNewBtn');
+            if (addNewBtn) {
+                addNewBtn.addEventListener('click', async function () {
+                    await addNewItem();
+                    closeModal('addGifModal');
+                });
+            }
 
+            const createCategoryBtn = document.getElementById('createCategoryBtn');
+            if (createCategoryBtn) {
+                createCategoryBtn.addEventListener('click', async function () {
+                    await createNewCategory();
+                    closeModal('addCategoryModal');
+                });
+            }
 
-            // Обработчики для модальных окон
-            document.getElementById('addNewBtn').addEventListener('click', async function () {
-                await addNewItem();
-                closeModal('addGifModal');
-            });
-
-            document.getElementById('createCategoryBtn').addEventListener('click', async function () {
-                await createNewCategory();
-                closeModal('addCategoryModal');
-            });
-
-            // Обработчики закрытия модальных окон
+            // ===== ЗАКРЫТИЕ МОДАЛЬНЫХ ОКОН =====
             document.querySelectorAll('.close-modal, .cancel-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const modal = this.closest('.modal');
-                    closeModal(modal.id);
+                    if (modal) {
+                        closeModal(modal.id);
+                    }
                 });
             });
 
-            // Закрытие модального окна при клике вне его
             window.addEventListener('click', function (event) {
                 if (event.target.classList.contains('modal')) {
                     closeModal(event.target.id);
@@ -3478,52 +4358,127 @@
             document.addEventListener('click', function (e) {
                 if (!e.target.closest('.category-menu-trigger') && !e.target.closest('.category-dropdown-menu')) {
                     document.querySelectorAll('.category-dropdown-menu').forEach(menu => {
-                        menu.classList.remove('show');
+                        if (menu) {
+                            menu.classList.remove('show');
+                        }
                     });
                 }
             });
 
-            // Обработчики для GIF панели
-            document.getElementById('togglePanelBtn').addEventListener('click', toggleGifPanel);
-            document.getElementById('pinPanelBtn').addEventListener('click', togglePinPanel);
-            document.getElementById('refreshPanelBtn').addEventListener('click', refreshPanelData);
-            document.getElementById('minimizePanelBtn').addEventListener('click', minimizePanel);
-            document.getElementById('closePanelBtn').addEventListener('click', toggleGifPanel);
-            document.getElementById('settingsPanelBtn').addEventListener('click', showSettingsModal);
+            // ===== ЭЛЕМЕНТЫ ПАНЕЛИ (с проверкой существования) =====
+            const togglePanelBtn = document.getElementById('togglePanelBtn');
+            if (togglePanelBtn) {
+                togglePanelBtn.addEventListener('click', toggleGifPanel);
+            }
 
-            // Обработчики перемещения панели
-            document.getElementById('panelHeader').addEventListener('mousedown', startPanelDrag);
-            document.addEventListener('mousemove', dragPanel);
-            document.addEventListener('mouseup', stopPanelDrag);
+            const pinPanelBtn = document.getElementById('pinPanelBtn');
+            if (pinPanelBtn) {
+                pinPanelBtn.addEventListener('click', togglePinPanel);
+            }
 
-            // Обработчики модального окна настроек
-            document.getElementById('closeSettingsBtn').addEventListener('click', hideSettingsModal);
-            document.getElementById('saveSettingsBtn').addEventListener('click', saveHotkeySettings);
-            document.getElementById('resetSettingsBtn').addEventListener('click', resetHotkeySettings);
+            const refreshPanelBtn = document.getElementById('refreshPanelBtn');
+            if (refreshPanelBtn) {
+                refreshPanelBtn.addEventListener('click', refreshPanelData);
+            }
 
-            // Обработчики ввода горячих клавиш
+            const minimizePanelBtn = document.getElementById('minimizePanelBtn');
+            if (minimizePanelBtn) {
+                minimizePanelBtn.addEventListener('click', minimizePanel);
+            }
+
+            const closePanelBtn = document.getElementById('closePanelBtn');
+            if (closePanelBtn) {
+                closePanelBtn.addEventListener('click', toggleGifPanel);
+            }
+
+            const settingsPanelBtn = document.getElementById('settingsPanelBtn');
+            if (settingsPanelBtn) {
+                settingsPanelBtn.addEventListener('click', showSettingsModal);
+            }
+
+            const panelHeader = document.getElementById('panelHeader');
+            if (panelHeader) {
+                panelHeader.addEventListener('mousedown', startPanelDrag);
+                document.addEventListener('mousemove', dragPanel);
+                document.addEventListener('mouseup', stopPanelDrag);
+            }
+
+            const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+            if (closeSettingsBtn) {
+                closeSettingsBtn.addEventListener('click', hideSettingsModal);
+            }
+
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', saveHotkeySettings);
+            }
+
+            const resetSettingsBtn = document.getElementById('resetSettingsBtn');
+            if (resetSettingsBtn) {
+                resetSettingsBtn.addEventListener('click', resetHotkeySettings);
+            }
+
+            // ===== НАСТРОЙКИ ГОРЯЧИХ КЛАВИШ =====
             setupHotkeyInputs();
-
-            // Обработчики горячих клавиш
             document.addEventListener('keydown', handleHotkeys);
-
-            // Обновляем подсказку о горячих клавишах
             updateHotkeyHint();
-
-            // Обновляем кнопку закрепления
             updatePinButton();
+
             document.addEventListener('click', function (e) {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
                     e.target.focus();
                 }
             });
 
-            // Обработчик для получения уведомлений из main процесса
+            // ===== IPC ОБРАБОТЧИКИ =====
             ipcRenderer.on('show-import-item-notification', (event, item) => {
-                showImportItemNotification(item);
+                if (typeof showImportItemNotification === 'function') {
+                    showImportItemNotification(item);
+                }
             });
+
+            // Обработчик для уведомления о новом контенте
+            ipcRenderer.on('content-update-available', (event, data) => {
+                console.log('Content update available:', data);
+                if (typeof showContentUpdateNotification === 'function') {
+                    showContentUpdateNotification(data);
+                }
+            });
+
+            // Обработчик для уведомления о новых системных GIF
+            ipcRenderer.on('new-system-gifs', (event, data) => {
+                console.log('New system GIFs:', data);
+                showNotification(`✅ Добавлено ${data.count} новых системных GIF!`);
+                // Перезагружаем данные
+                setTimeout(async () => {
+                    const loadedData = await ipcRenderer.invoke('load-initial-data');
+                    categories = loadedData.categories || [];
+                    itemsData = loadedData.itemsData || {};
+                    await updateCategoryUI();
+                    if (categories.length > 0) {
+                        switchCategory(categories[0].key);
+                    }
+                }, 1000);
+            });
+
+            // После загрузки начальных данных, проверяем обновления контента
+            setTimeout(async () => {
+                try {
+                    const hasUpdate = await ipcRenderer.invoke('check-content-updates');
+                    if (hasUpdate) {
+                        console.log('Content update check completed');
+                    }
+                } catch (error) {
+                    console.error('Error checking content updates:', error);
+                }
+            }, 3000);
         };
 
+                // Настройка поиска
+        setupSearch();
+
+        // Показываем/скрываем поиск при загрузке
+        setTimeout(toggleSearchVisibility, 100);
     </script>
 </body>
 

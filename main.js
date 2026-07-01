@@ -7,10 +7,11 @@ const { globalShortcut } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { clipboard } = require('electron');
 
-
+// Импортируем модуль обновления контента
+const contentUpdater = require('./contentUpdater');
 
 let mainWindow;
-let gifWindow = null; // Явно инициализируем как null
+let gifWindow = null;
 let updateWindow = null;
 let tray;
 let currentHotkey = 'CommandOrControl+Shift+G';
@@ -63,8 +64,8 @@ function createMainWindow() {
             contextIsolation: false
         },
         show: false,
-        frame: false, // Полностью отключаем стандартную рамку
-        backgroundColor: '#1a1a1a' // Темный фон окна
+        frame: false,
+        backgroundColor: '#1a1a1a'
     });
 
     mainWindow.webContents.on('dom-ready', () => {
@@ -81,7 +82,6 @@ function createMainWindow() {
     `);
     });
 
-
     mainWindow.loadFile('Gifpage.html');
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
@@ -92,24 +92,19 @@ function createMainWindow() {
     });
 }
 
-// Улучшенная функция открытия панели
 function openGifPanel() {
-    // Проверяем, существует ли окно, не уничтожено ли оно И видимо ли оно
     if (gifWindow && !gifWindow.isDestroyed()) {
         if (gifWindow.isVisible()) {
-            gifWindow.focus(); // Если видимо - фокусируем
+            gifWindow.focus();
         } else {
-            // Если невидимо - пробуем показать
             gifWindow.show();
         }
         return;
     }
 
-    // Если окна нет или оно уничтожено - создаем новое
     createNewGifPanel();
 }
 
-// Выносим логику создания в отдельную функцию
 function createNewGifPanel() {
     const savedBounds = getSavedWindowBounds();
 
@@ -146,12 +141,10 @@ function createNewGifPanel() {
         gifWindow = null;
     });
 
-    // Сохраняем размеры и положение при изменении
     gifWindow.on('resize', debounce(saveWindowBounds, 500));
     gifWindow.on('move', debounce(saveWindowBounds, 500));
 }
 
-// Улучшенная функция для сохранения параметров окна
 function saveWindowBounds() {
     if (!gifWindow || gifWindow.isDestroyed()) return;
 
@@ -173,7 +166,6 @@ function saveWindowBounds() {
     }
 }
 
-// Улучшенная функция для загрузки сохраненных параметров
 function getSavedWindowBounds() {
     const defaultBounds = { x: undefined, y: undefined, width: 400, height: 500 };
     try {
@@ -182,7 +174,6 @@ function getSavedWindowBounds() {
             'utf-8'
         );
         const saved = JSON.parse(data);
-        // Гарантируем, что x и y существуют и являются числами
         return {
             x: typeof saved.x === 'number' ? saved.x : undefined,
             y: typeof saved.y === 'number' ? saved.y : undefined,
@@ -190,11 +181,10 @@ function getSavedWindowBounds() {
             height: saved.height || defaultBounds.height
         };
     } catch (err) {
-        return defaultBounds; // Возвращаем полный объект с умолчаниями
+        return defaultBounds;
     }
 }
 
-// Вспомогательная функция для ограничения частоты вызовов
 function debounce(func, wait) {
     let timeout;
     return function () {
@@ -234,9 +224,31 @@ async function loadHotkey() {
         console.log('Using default hotkey');
     }
 
-    // Регистрируем основную горячую клавишу
     registerHotkey();
 }
+
+// ===== ФУНКЦИИ ДЛЯ ОБНОВЛЕНИЯ КОНТЕНТА =====
+async function checkContentUpdatesOnStart() {
+    try {
+        console.log('Checking for content updates...');
+        const hasUpdate = await contentUpdater.checkContentUpdates();
+        if (hasUpdate) {
+            console.log('Content update available!');
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                const updateData = contentUpdater.contentUpdateData;
+                mainWindow.webContents.send('content-update-available', {
+                    version: updateData.version,
+                    count: updateData.content.systemGifs ? updateData.content.systemGifs.length : 0
+                });
+            }
+        } else {
+            console.log('No content updates available');
+        }
+    } catch (error) {
+        console.error('Error checking content updates:', error);
+    }
+}
+// ===== КОНЕЦ ФУНКЦИЙ ДЛЯ ОБНОВЛЕНИЯ КОНТЕНТА =====
 
 ipcMain.handle('save-hotkey', async (event, hotkey) => {
     try {
@@ -257,7 +269,6 @@ ipcMain.handle('get-hotkey', async () => {
     return currentHotkey;
 });
 
-// Обработчики для GIF-панели
 ipcMain.on('panel-minimize', () => {
     if (gifWindow) gifWindow.minimize();
 });
@@ -276,7 +287,6 @@ ipcMain.on('panel-close', () => {
     if (gifWindow) gifWindow.close();
 });
 
-// Отслеживание состояния панели
 if (gifWindow) {
     gifWindow.on('maximize', () => {
         gifWindow.webContents.send('panel-state-changed', true);
@@ -286,7 +296,6 @@ if (gifWindow) {
     });
 }
 
-// Добавьте обработчики IPC основы
 ipcMain.on('window-minimize', () => mainWindow.minimize());
 ipcMain.on('window-maximize', () => {
     if (mainWindow.isMaximized()) {
@@ -306,10 +315,7 @@ ipcMain.on('open-gif-panel', () => {
 
 ipcMain.on('toggle-always-on-top', (event, { state, level }) => {
     if (gifWindow) {
-        // Устанавливаем уровень поверх других окон
         gifWindow.setAlwaysOnTop(state, level);
-
-        // Фикс для Nvidia: принудительно обновляем состояние
         if (state) {
             setTimeout(() => {
                 gifWindow.setAlwaysOnTop(false);
@@ -333,7 +339,6 @@ ipcMain.handle('save-data', async (event, data) => {
     });
     return result;
 });
-
 
 ipcMain.handle('create-backup', async () => {
     return dataManager.createBackup();
@@ -373,7 +378,6 @@ ipcMain.handle('copy-gif-file', async (event, { fromGifId, toGifId }) => {
 });
 
 ipcMain.handle('export-data', async (event, exportData) => {
-    // Теперь просто возвращаем подготовленные данные
     return {
         data: exportData,
         gifCount: Object.values(exportData.itemsData).reduce((acc, items) => acc + items.length, 0)
@@ -385,43 +389,34 @@ ipcMain.on('data-updated', async () => {
     const newCategories = data.categories || [];
     itemsData = data.itemsData || {};
 
-    // Сохраняем текущий порядок категорий при обновлении
     const currentOrder = categories.map(cat => cat.id);
     categories = newCategories;
 
-    // Восстанавливаем порядок
     if (currentOrder.length === categories.length) {
         categories.sort((a, b) => {
             return currentOrder.indexOf(a.id) - currentOrder.indexOf(b.id);
         });
     }
 
-    // Сохраняем новый порядок
     await ipcRenderer.invoke('save-categories-order', categories.map(cat => cat.id));
-
     renderCategories();
 });
 
 ipcMain.handle('save-export-file', async (event, { exportData, filePath }) => {
     try {
-        const GIFS_DIR = path.join(app.getPath('userData'), 'gifs'); // Добавляем определение
         const tempDir = path.join(app.getPath('temp'), `gif_export_${Date.now()}`);
-
-        // Создаем временную директорию
         fs.mkdirSync(tempDir, { recursive: true });
 
-        // 1. Собираем все GIF ID из выбранных категорий
         const gifsToExport = new Set();
         for (const catId in exportData.itemsData) {
             exportData.itemsData[catId].forEach(item => {
-                if (item.gifId) { // Добавляем проверку на существование gifId
+                if (item.gifId) {
                     gifsToExport.add(item.gifId);
                 }
             });
         }
 
-        // 2. Копируем только нужные GIF файлы
-        if (fs.existsSync(GIFS_DIR)) { // Проверяем существование директории
+        if (fs.existsSync(GIFS_DIR)) {
             const allGifs = fs.readdirSync(GIFS_DIR);
             allGifs.forEach(file => {
                 if (file.endsWith('.gif')) {
@@ -436,20 +431,17 @@ ipcMain.handle('save-export-file', async (event, { exportData, filePath }) => {
             });
         }
 
-        // 3. Сохраняем данные
         fs.writeFileSync(
             path.join(tempDir, 'data.json'),
             JSON.stringify(exportData, null, 2)
         );
 
-        // 4. Архивируем
         const archiver = require('archiver');
         const output = fs.createWriteStream(filePath);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
         return new Promise((resolve) => {
             output.on('close', () => {
-                // Удаляем временную директорию после архивации
                 fs.rmSync(tempDir, { recursive: true });
                 resolve(true);
             });
@@ -520,10 +512,8 @@ ipcMain.handle('import-data', async () => {
             mergedData = importedData;
         }
 
-        // Сохраняем данные
         await dataManager.saveData(mergedData);
 
-        // Отправляем событие об обновлении данных во все окна
         BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('data-updated', mergedData);
         });
@@ -539,6 +529,7 @@ ipcMain.handle('import-data', async () => {
         }
     }
 });
+
 ipcMain.handle('save-categories-order', async (event, order) => {
     await fs.promises.writeFile(
         path.join(app.getPath('userData'), 'categories-order.json'),
@@ -557,6 +548,7 @@ ipcMain.handle('load-categories-order', async () => {
         return null;
     }
 });
+
 ipcMain.on('restart-app', () => {
     app.relaunch();
     app.exit(0);
@@ -585,7 +577,6 @@ function createApplicationMenu() {
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
-// Обработчик для получения URL гифки
 ipcMain.handle('get-gif-url', async (event, gifId) => {
     const gifPath = path.join(__dirname, 'gifs', `${gifId}.gif`);
 
@@ -600,12 +591,8 @@ ipcMain.handle('get-gif-url', async (event, gifId) => {
     }
 });
 
-// Обработчик для обновления URL гифки
 ipcMain.handle('update-gif-url', async (event, { gifId, url }) => {
     try {
-        const GIFS_DIR = path.join(app.getPath('userData'), 'gifs');
-
-        // Создаем директорию, если не существует
         if (!fs.existsSync(GIFS_DIR)) {
             fs.mkdirSync(GIFS_DIR, { recursive: true });
         }
@@ -613,20 +600,16 @@ ipcMain.handle('update-gif-url', async (event, { gifId, url }) => {
         const gifPath = path.join(GIFS_DIR, `${gifId}.gif`);
         const tempPath = path.join(GIFS_DIR, `${gifId}_temp.gif`);
 
-        // Загружаем новую гифку во временный файл
         const response = await fetch(url);
         const buffer = await response.arrayBuffer();
         fs.writeFileSync(tempPath, Buffer.from(buffer));
 
-        // Удаляем старый файл (если есть)
         if (fs.existsSync(gifPath)) {
             fs.unlinkSync(gifPath);
         }
 
-        // Переименовываем временный файл
         fs.renameSync(tempPath, gifPath);
 
-        // Форсируем обновление во всех окнах
         BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('gif-updated', {
                 gifId,
@@ -641,18 +624,104 @@ ipcMain.handle('update-gif-url', async (event, { gifId, url }) => {
     }
 });
 
-// Функция регистрации шорткатов
+// ===== ОБРАБОТЧИКИ ДЛЯ ОБНОВЛЕНИЯ КОНТЕНТА =====
+ipcMain.handle('apply-content-update', async () => {
+    try {
+        console.log('Applying content update...');
+        const result = await contentUpdater.applyContentUpdate();
+        if (result) {
+            // Отправляем уведомление во все окна
+            BrowserWindow.getAllWindows().forEach(win => {
+                win.webContents.send('data-updated');
+            });
+            console.log('Content update applied successfully');
+        }
+        return result;
+    } catch (error) {
+        console.error('Error applying content update:', error);
+        return false;
+    }
+});
+
+ipcMain.handle('check-content-updates', async () => {
+    try {
+        console.log('Checking content updates...');
+        return await contentUpdater.checkContentUpdates();
+    } catch (error) {
+        console.error('Error checking content updates:', error);
+        return false;
+    }
+});
+
+ipcMain.handle('generate-content-file', () => {
+    try {
+        return contentUpdater.generateContentFile();
+    } catch (error) {
+        console.error('Error generating content file:', error);
+        return null;
+    }
+});
+
+ipcMain.handle('show-import-notifications', async (event, newItems) => {
+    try {
+        if (!newItems || newItems.length === 0) {
+            console.log('Нет новых элементов для уведомлений');
+            return true;
+        }
+
+        console.log(`Новых элементов: ${newItems.length}`);
+        
+        if (newItems.length > 10) {
+            const categoriesSummary = {};
+            newItems.forEach(item => {
+                if (!categoriesSummary[item.categoryName]) {
+                    categoriesSummary[item.categoryName] = 0;
+                }
+                categoriesSummary[item.categoryName]++;
+            });
+            
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('show-import-bulk-notification', {
+                    totalCount: newItems.length,
+                    categories: categoriesSummary
+                });
+            }
+            return true;
+        }
+        
+        for (const item of newItems) {
+            const gifPath = path.join(app.getPath('userData'), 'gifs', `${item.gifId}.gif`);
+            const gifExists = fs.existsSync(gifPath);
+            
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('show-import-item-notification', {
+                    categoryName: item.categoryName,
+                    code: item.code,
+                    gifId: item.gifId,
+                    gifPath: gifExists ? `file://${gifPath}?t=${Date.now()}` : null
+                });
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 800));
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error showing import notifications:', error);
+        return false;
+    }
+});
+// ===== КОНЕЦ ОБРАБОТЧИКОВ ДЛЯ ОБНОВЛЕНИЯ КОНТЕНТА =====
+
+// ===== ФУНКЦИИ ДЛЯ ШОРТКАТОВ =====
 function registerShortcuts(shortcuts = []) {
     try {
-        // Сначала снимаем все шорткаты, кроме основной горячей клавиши
         globalShortcut.unregisterAll();
 
-        // Регистрируем основную горячую клавишу
         if (currentHotkey) {
             globalShortcut.register(currentHotkey, toggleGifPanel);
         }
 
-        // Регистрируем шорткаты для GIF
         shortcuts.forEach(shortcut => {
             try {
                 if (shortcut.key && shortcut.key !== currentHotkey) {
@@ -688,7 +757,6 @@ async function loadShortcuts() {
     }
 }
 
-// Обработчики для шорткатов
 ipcMain.handle('load-shortcuts', async () => {
     try {
         const data = await fs.promises.readFile(
@@ -708,10 +776,8 @@ ipcMain.handle('save-shortcuts', async (event, shortcuts) => {
             JSON.stringify(shortcuts)
         );
 
-        // Перерегистрируем шорткаты после сохранения
         registerShortcuts(shortcuts);
 
-        // Уведомляем все окна о новых шорткатах
         BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('shortcuts-updated', shortcuts);
         });
@@ -722,63 +788,11 @@ ipcMain.handle('save-shortcuts', async (event, shortcuts) => {
         return false;
     }
 });
+// ===== КОНЕЦ ФУНКЦИЙ ДЛЯ ШОРТКАТОВ =====
 
-ipcMain.handle('show-import-notifications', async (event, newItems) => {
-    try {
-        if (!newItems || newItems.length === 0) {
-            console.log('Нет новых элементов для уведомлений');
-            return true;
-        }
-
-        console.log(`Новых элементов: ${newItems.length}`);
-        
-        // Если новых элементов больше 10, показываем сводку по категориям
-        if (newItems.length > 10) {
-            // Группируем по категориям
-            const categoriesSummary = {};
-            newItems.forEach(item => {
-                if (!categoriesSummary[item.categoryName]) {
-                    categoriesSummary[item.categoryName] = 0;
-                }
-                categoriesSummary[item.categoryName]++;
-            });
-            
-            // Отправляем сводку
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send('show-import-bulk-notification', {
-                    totalCount: newItems.length,
-                    categories: categoriesSummary
-                });
-            }
-            return true;
-        }
-        
-        // Если элементов 10 или меньше, показываем по одному
-        for (const item of newItems) {
-            const gifPath = path.join(app.getPath('userData'), 'gifs', `${item.gifId}.gif`);
-            const gifExists = fs.existsSync(gifPath);
-            
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send('show-import-item-notification', {
-                    categoryName: item.categoryName,
-                    code: item.code,
-                    gifId: item.gifId,
-                    gifPath: gifExists ? `file://${gifPath}?t=${Date.now()}` : null
-                });
-            }
-            
-            await new Promise(resolve => setTimeout(resolve, 800));
-        }
-        
-        return true;
-    } catch (error) {
-        console.error('Error showing import notifications:', error);
-        return false;
-    }
-});
-
+// ===== АВТООБНОВЛЕНИЕ =====
 ipcMain.on('check-for-updates', () => {
-    autoUpdater.autoDownload = false; // Отключаем автоматическую загрузку
+    autoUpdater.autoDownload = false;
     autoUpdater.checkForUpdates().catch(err => {
         console.error('Ошибка при проверке обновлений:', err);
         if (mainWindow && !mainWindow.isDestroyed()) {
@@ -797,7 +811,6 @@ ipcMain.on('install-update', () => {
     autoUpdater.quitAndInstall();
 });
 
-// Обработчики событий автообновления
 autoUpdater.on('update-available', (info) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('update-available', {
@@ -832,6 +845,7 @@ autoUpdater.on('update-not-available', () => {
         });
     }
 });
+// ===== КОНЕЦ АВТООБНОВЛЕНИЯ =====
 
 app.whenReady().then(async () => {
     createApplicationMenu();
@@ -839,17 +853,16 @@ app.whenReady().then(async () => {
     createTray();
 
     try {
-        // Сначала загружаем горячую клавишу
         await loadHotkey();
-
-        // Затем загружаем и регистрируем шорткаты
         const shortcuts = await loadShortcuts();
         registerShortcuts(shortcuts);
-
         console.log('All shortcuts registered successfully');
     } catch (err) {
         console.error('Failed to register shortcuts:', err);
     }
+
+    // Проверяем обновления контента через 5 секунд после запуска
+    setTimeout(checkContentUpdatesOnStart, 5000);
 
     autoUpdater.checkForUpdatesAndNotify();
 });
@@ -867,7 +880,6 @@ app.on('activate', () => {
 });
 
 app.on('before-quit', async (event) => {
-    // Сохраняем параметры окна перед закрытием
     if (gifWindow && !gifWindow.isDestroyed()) {
         saveWindowBounds();
         event.preventDefault();

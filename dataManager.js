@@ -6,9 +6,29 @@ const DATA_FILE = path.join(app.getPath('userData'), 'gif_data.json');
 const BACKUP_DIR = path.join(app.getPath('userData'), 'backups');
 const GIFS_DIR = path.join(app.getPath('userData'), 'gifs');
 
+// Константы системной категории
+const SYSTEM_CATEGORY_ID = 'system_gifs';
+const SYSTEM_CATEGORY_NAME = '📦 Системные GIF';
+
 // Создаем необходимые директории
 if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
 if (!fs.existsSync(GIFS_DIR)) fs.mkdirSync(GIFS_DIR, { recursive: true });
+
+// Функция для получения системной категории
+function getSystemCategory() {
+    return {
+        id: SYSTEM_CATEGORY_ID,
+        name: SYSTEM_CATEGORY_NAME,
+        key: 'system-gifs',
+        color: '#6c5ce7',
+        isSystem: true
+    };
+}
+
+// Функция для проверки, является ли категория системной
+function isSystemCategory(categoryId) {
+    return categoryId === SYSTEM_CATEGORY_ID;
+}
 
 function exportWithFiles(data, targetDir) {
     try {
@@ -36,9 +56,17 @@ function exportWithFiles(data, targetDir) {
     }
 }
 
-
 function mergeData(newData) {
     const currentData = loadData();
+    
+    // Фильтруем системную категорию из импортируемых данных
+    const filteredNewCategories = newData.categories.filter(c => !c.isSystem && c.id !== SYSTEM_CATEGORY_ID);
+    const filteredNewItems = {};
+    for (const [catId, items] of Object.entries(newData.itemsData)) {
+        if (catId !== SYSTEM_CATEGORY_ID) {
+            filteredNewItems[catId] = items;
+        }
+    }
     
     // Собираем все существующие GIF ID из текущих данных
     const existingGifIds = new Set();
@@ -48,13 +76,13 @@ function mergeData(newData) {
 
     // Создаем карту категорий для быстрого доступа к названиям
     const categoryMap = {};
-    newData.categories.forEach(cat => {
+    filteredNewCategories.forEach(cat => {
         categoryMap[cat.id] = cat.name;
     });
 
     // Объединяем категории (с проверкой дубликатов по ID)
     const mergedCategories = [...currentData.categories];
-    newData.categories.forEach(newCat => {
+    filteredNewCategories.forEach(newCat => {
         const exists = mergedCategories.some(cat => cat.id === newCat.id);
         if (!exists) {
             mergedCategories.push(newCat);
@@ -65,9 +93,9 @@ function mergeData(newData) {
 
     // Объединяем itemsData с проверкой дубликатов GIF
     const mergedItemsData = { ...currentData.itemsData };
-    const newItems = []; // Массив для действительно новых элементов
+    const newItems = [];
     
-    for (const [catId, items] of Object.entries(newData.itemsData)) {
+    for (const [catId, items] of Object.entries(filteredNewItems)) {
         if (!mergedItemsData[catId]) {
             mergedItemsData[catId] = [];
         }
@@ -76,9 +104,7 @@ function mergeData(newData) {
         const newItemsInCategory = items.filter(item => !existingGifsInCategory.has(item.gifId));
 
         if (newItemsInCategory.length > 0) {
-            // Добавляем информацию только о тех элементах, которых нет ВООБЩЕ нигде в приложении
             newItemsInCategory.forEach(item => {
-                // Проверяем, что такого GIF ID нет ни в одной категории
                 if (!existingGifIds.has(item.gifId)) {
                     newItems.push({
                         categoryId: catId,
@@ -86,7 +112,7 @@ function mergeData(newData) {
                         code: item.code,
                         gifId: item.gifId
                     });
-                    console.log('Новый элемент для уведомления:', { // Для отладки
+                    console.log('Новый элемент для уведомления:', {
                         categoryId: catId,
                         categoryName: categoryMap[catId],
                         code: item.code,
@@ -105,7 +131,7 @@ function mergeData(newData) {
         categories: mergedCategories,
         itemsData: mergedItemsData,
         gifs: { ...currentData.gifs, ...newData.gifs },
-        newItems: newItems // Только действительно новые элементы
+        newItems: newItems
     };
 }
 
@@ -181,6 +207,7 @@ function validateImportedData(data) {
 
     return true;
 }
+
 async function importWithFiles(sourceDir) {
     try {
         // 1. Проверяем наличие файла данных
@@ -209,7 +236,7 @@ async function importWithFiles(sourceDir) {
         return importedData;
     } catch (error) {
         console.error('Error importing with files:', error);
-        throw error; // Пробрасываем ошибку дальше
+        throw error;
     }
 }
 
@@ -227,12 +254,34 @@ function loadData() {
     try {
         if (fs.existsSync(DATA_FILE)) {
             const rawData = fs.readFileSync(DATA_FILE, 'utf-8');
-            return JSON.parse(rawData);
+            const data = JSON.parse(rawData);
+            
+            // Проверяем наличие системной категории
+            const hasSystemCat = data.categories.some(c => c.id === SYSTEM_CATEGORY_ID);
+            if (!hasSystemCat) {
+                // Добавляем системную категорию в начало
+                data.categories.unshift(getSystemCategory());
+                if (!data.itemsData[SYSTEM_CATEGORY_ID]) {
+                    data.itemsData[SYSTEM_CATEGORY_ID] = [];
+                }
+                // Сохраняем изменения
+                saveData(data);
+            }
+            
+            return data;
         }
     } catch (error) {
         console.error('Error loading data:', error);
     }
-    return { categories: [], itemsData: {}, gifs: {} };
+    
+    // Если файла нет, создаем с системной категорией
+    const defaultData = {
+        categories: [getSystemCategory()],
+        itemsData: { [SYSTEM_CATEGORY_ID]: [] },
+        gifs: {}
+    };
+    saveData(defaultData);
+    return defaultData;
 }
 
 function createBackup() {
@@ -291,6 +340,41 @@ function deleteGif(gifId) {
     }
 }
 
+// Функция для удаления категории
+function deleteCategory(categoryId) {
+    if (isSystemCategory(categoryId)) {
+        throw new Error('Системную категорию нельзя удалить');
+    }
+    
+    try {
+        const data = loadData();
+        data.categories = data.categories.filter(c => c.id !== categoryId);
+        delete data.itemsData[categoryId];
+        saveData(data);
+        return true;
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        return false;
+    }
+}
+
+// Вспомогательные функции для проверки прав
+function getUserCategories(data) {
+    return data.categories.filter(c => !c.isSystem && c.id !== SYSTEM_CATEGORY_ID);
+}
+
+function canEditCategory(categoryId) {
+    return !isSystemCategory(categoryId);
+}
+
+function canDeleteItem(categoryId) {
+    return !isSystemCategory(categoryId);
+}
+
+function canMoveItem(categoryId) {
+    return !isSystemCategory(categoryId);
+}
+
 module.exports = {
     saveData,
     loadData,
@@ -300,5 +384,15 @@ module.exports = {
     deleteGif,
     exportWithFiles,
     importWithFiles,
-    mergeData
+    mergeData,
+    exportSelectedData,
+    // Новые функции
+    getSystemCategory,
+    isSystemCategory,
+    deleteCategory,
+    getUserCategories,
+    canEditCategory,
+    canDeleteItem,
+    canMoveItem,
+    SYSTEM_CATEGORY_ID
 };
