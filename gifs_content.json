@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "systemGifs": [
     {
       "code": ":ministitch",
@@ -364,6 +364,78 @@
     {
       "code": ":minirotoff",
       "gifId": "gif_1782903562572_x8900ifof"
+    },
+    {
+      "code": ":minimda",
+      "gifId": "gif_1782926592654"
+    },
+    {
+      "code": ":minieverest",
+      "gifId": "gif_1782926931560"
+    },
+    {
+      "code": ":minikatrinka",
+      "gifId": "gif_1782927554901"
+    },
+    {
+      "code": ":minisila",
+      "gifId": "gif_1782927570227"
+    },
+    {
+      "code": ":miniuwu",
+      "gifId": "gif_1782927584531"
+    },
+    {
+      "code": ":miniassnutella",
+      "gifId": "gif_1782927640509"
+    },
+    {
+      "code": ":minilol",
+      "gifId": "gif_1782927657446"
+    },
+    {
+      "code": ":minimenu",
+      "gifId": "gif_1782927674584"
+    },
+    {
+      "code": ":mininiks",
+      "gifId": "gif_1782927745722"
+    },
+    {
+      "code": ":mininutellaa2",
+      "gifId": "gif_1782927762331"
+    },
+    {
+      "code": ":miniobida",
+      "gifId": "gif_1782927783601"
+    },
+    {
+      "code": ":miniomvdp",
+      "gifId": "gif_1782927806246"
+    },
+    {
+      "code": ":minirotoff1",
+      "gifId": "gif_1782927887820"
+    },
+    {
+      "code": ":minismotrim",
+      "gifId": "gif_1782927904760"
+    },
+    {
+      "code": ":minisun",
+      "gifId": "gif_1782927918555"
+    },
+    {
+      "code": ":minisun11",
+      "gifId": "gif_1782928004499"
+    },
+    {
+      "code": ":miniups",
+      "gifId": "gif_1782928042865"
+    },
+    {
+      "code": ":minizmr",
+      "gifId": "gif_1782928055932"
     }
   ]
 }

@@ -2312,10 +2312,17 @@
             
             document.getElementById('applyContentUpdateBtn').addEventListener('click', async () => {
                 try {
+                    // Открываем модальное окно, если оно закрыто
+                    const modal = document.getElementById('updateModal');
+                    if (modal && modal.style.display !== 'flex') {
+                        modal.style.display = 'flex';
+                    }
+                    
                     // Показываем прогресс-бар
                     const progressContainer = document.getElementById('contentUpdateProgress');
                     if (progressContainer) {
                         progressContainer.style.display = 'block';
+                        console.log('✅ Прогресс-бар показан');
                     }
                     
                     // Скрываем кнопки
@@ -2325,11 +2332,9 @@
                     const success = await ipcRenderer.invoke('apply-content-update');
                     if (success) {
                         showNotification('✅ Контент обновлен!');
-                        // Прогресс-бар скроется автоматически через 3 секунды
                         setTimeout(() => {
                             const notification = document.getElementById('contentUpdateNotification');
                             if (notification) notification.style.display = 'none';
-                            // Перезагружаем данные
                             location.reload();
                         }, 2000);
                     } else {
@@ -2404,8 +2409,25 @@
 
         // Функция для получения категории по ID
         function getCategoryById(categoryId) {
+            console.log('🔍 getCategoryById вызвана с ID:', categoryId);
+            
             const id = String(categoryId);
-            return categories.find(c => String(c.id) === id);
+            let category = categories.find(c => String(c.id) === id);
+            
+            // Если категория не найдена, но это system_gifs - создаем временную
+            if (!category && id === 'system_gifs') {
+                console.log('⚠️ Создаем временную системную категорию');
+                category = {
+                    id: 'system_gifs',
+                    name: '📦 Системные GIF',
+                    key: 'system-gifs',
+                    color: '#6c5ce7',
+                    isSystem: true
+                };
+            }
+            
+            console.log('🔍 Результат:', category);
+            return category;
         }
 
         // Функция для копирования кода
@@ -2564,7 +2586,7 @@
                     `;
                 }
 
-                const deleteBtn = isSystem ? '' : `<button class="gif-delete-btn" onclick="deleteItem('${categoryId}', ${index})"></button>`;
+                const deleteBtn = `<button class="gif-delete-btn" onclick="deleteItem('${categoryId}', ${index})"></button>`;
                 const editInput = isSystem ? '' : `<input type="text" id="code-edit-${categoryId}-${index}" value="${item.code}" style="display: none; width: 100%; padding: 5px; border-radius: 4px; border: 1px solid ${category.color}; background-color: rgba(0,0,0,0.5); color: white;">`;
                 const codeStyle = isSystem ? 'font-size: 18px;' : '';
 
@@ -2780,8 +2802,11 @@
             categorySelect.innerHTML = '';
             categories.forEach(category => {
                 const option = document.createElement('option');
-                option.value = category.id;
+                option.value = category.id; // Не меняем, оставляем как есть
                 option.textContent = category.name;
+                if (category.isSystem) {
+                    option.textContent += ' 🔒';
+                }
                 categorySelect.appendChild(option);
             });
         }
@@ -3055,7 +3080,7 @@
 
         // Функция для сохранения изменений категории
         async function saveCategoryChanges() {
-            const categoryId = parseInt(document.getElementById('editCategoryModal').dataset.categoryId);
+            const categoryId = document.getElementById('newCategory').value;
             const newName = document.getElementById('editCategoryName').value.trim();
             const newColor = selectedColor;
 
@@ -3260,39 +3285,57 @@
 
         // Функция для добавления нового элемента
         async function addNewItem() {
-            const categoryId = parseInt(document.getElementById('newCategory').value);
+            // НЕ используйте parseInt! Просто берем значение как есть
+            const categoryId = document.getElementById('newCategory').value;
             const code = document.getElementById('newCode').value.trim();
             const gifUrl = document.getElementById('newGifUrl').value.trim();
+
+            console.log('📝 Добавление:', { categoryId, code, gifUrl });
 
             if (!code) {
                 alert("Пожалуйста, введите код");
                 return;
             }
 
-            // Проверяем дубликаты в системной категории
-            if (isSystemCategory(categoryId)) {
-                const systemItems = itemsData[categoryId] || [];
-                if (systemItems.some(item => item.code === code)) {
-                    showNotification('Такой код уже существует в системной категории!', true);
-                    return;
-                }
+            // Проверяем, существует ли категория
+            const category = getCategoryById(categoryId);
+            if (!category) {
+                console.error('❌ Категория не найдена! ID:', categoryId);
+                showNotification('❌ Категория не найдена!', true);
+                return;
+            }
+
+            // ===== ПРОВЕРКА ДУБЛИКАТОВ ТОЛЬКО В ТЕКУЩЕЙ КАТЕГОРИИ =====
+            const currentItems = itemsData[categoryId] || [];
+            if (currentItems.some(item => item.code === code)) {
+                showNotification(`❌ Код "${code}" уже существует в категории "${category.name}"!`, true);
+                return;
             }
 
             const gifId = `gif_${generateId()}`;
             const newItem = { code, gifId };
 
-            if (!itemsData[categoryId]) itemsData[categoryId] = [];
+            // Добавляем в выбранную категорию
+            if (!itemsData[categoryId]) {
+                itemsData[categoryId] = [];
+            }
             itemsData[categoryId].push(newItem);
 
             await saveAllData();
 
             if (gifUrl) {
-                await ipcRenderer.invoke('save-gif', { gifId, url: gifUrl });
+                const success = await ipcRenderer.invoke('save-gif', { gifId, url: gifUrl });
+                if (!success) {
+                    showNotification('⚠️ GIF не загрузился, но код добавлен', true);
+                }
             }
 
             await updateCategoryUI();
             document.getElementById('newCode').value = '';
             document.getElementById('newGifUrl').value = '';
+            
+            const catName = getCategoryById(categoryId)?.name || 'категорию';
+            showNotification(`✅ Элемент "${code}" добавлен в "${catName}"`);
         }
 
         // Функция для создания новой категории
@@ -3336,50 +3379,38 @@
 
         // Функция для удаления элемента
         async function deleteItem(categoryId, index) {
-            // Запрещаем удаление из системной категории
-            if (isSystemCategory(categoryId)) {
-                showNotification('Нельзя удалять элементы из системной категории!', true);
-                return;
-            }
-
+            // РАЗРЕШАЕМ удаление из системной категории (с подтверждением)
             const category = getCategoryById(categoryId);
             if (!category) return;
 
-            // Заменяем confirm на кастомное модальное окно
+            const item = itemsData[categoryId]?.[index];
+            if (!item) return;
+
+            // Подтверждение удаления
             const isConfirmed = await customConfirm(
-                `Удалить элемент "${itemsData[categoryId][index].code}" из категории "${category.name}"?`,
+                `Удалить элемент "${item.code}" из категории "${category.name}"?`,
                 'Подтвердите удаление'
             );
 
             if (!isConfirmed) return;
 
-            const gifId = itemsData[categoryId][index].gifId;
+            const gifId = item.gifId;
 
             // Удаляем из массива
             itemsData[categoryId].splice(index, 1);
 
+            // Если категория стала пустой и это НЕ системная категория - можно удалить категорию?
+            // (оставляем как есть, пустая категория не удаляется)
+
             // Удаляем файл GIF
             const deleteSuccess = await ipcRenderer.invoke('delete-gif', gifId);
-
             if (!deleteSuccess) {
-                showNotification("Не удалось удалить GIF файл!", true);
-                return;
+                showNotification("⚠️ GIF файл не удален, но элемент удален из списка", true);
             }
 
             await saveAllData();
             await updateCategoryUI();
-            showNotification('Элемент удалён');
-
-            // Возвращаем фокус безопасным способом
-            setTimeout(() => {
-                const input = document.getElementById('newGifUrl');
-                if (input) {
-                    input.focus();
-                    if (document.activeElement !== input) {
-                        input.focus({ preventScroll: true });
-                    }
-                }
-            }, 50);
+            showNotification(`✅ Элемент "${item.code}" удален из "${category.name}"`);
         }
 
         // Функция для сохранения всех данных
@@ -4341,6 +4372,14 @@
             if (initialData) {
                 categories = initialData.categories || [];
                 itemsData = initialData.itemsData || {};
+                
+                // ДОБАВЬТЕ ЭТУ ПРОВЕРКУ:
+                console.log('📂 Загруженные категории:', JSON.stringify(categories, null, 2));
+                
+                // Проверяем системную категорию
+                const sysCat = categories.find(c => c.id === 'system_gifs');
+                console.log('🔍 Системная категория:', sysCat);
+                console.log('🔍 isSystem:', sysCat?.isSystem);
             }
 
             await updateCategoryUI();
@@ -4572,9 +4611,9 @@
                 }
             }, 3000);
 
-                        // Обработчик прогресса загрузки контента
+            // Обработчик прогресса загрузки контента
             ipcRenderer.on('content-update-progress', (event, data) => {
-                console.log('📊 Прогресс:', data);
+                console.log('📊 ПОЛУЧЕН ПРОГРЕСС:', data);
                 
                 const progressContainer = document.getElementById('contentUpdateProgress');
                 const progressBar = document.getElementById('contentProgressBar');
@@ -4583,41 +4622,66 @@
                 const progressStatus = document.getElementById('progressStatus');
                 const currentGifName = document.getElementById('currentGifName');
                 
-                if (!progressContainer) return;
+                // Проверяем, что все элементы найдены
+                console.log('🔍 Элементы:', {
+                    progressContainer: !!progressContainer,
+                    progressBar: !!progressBar,
+                    progressPercent: !!progressPercent,
+                    progressText: !!progressText,
+                    progressStatus: !!progressStatus,
+                    currentGifName: !!currentGifName
+                });
+                
+                if (!progressContainer) {
+                    console.error('❌ Контейнер прогресса не найден!');
+                    return;
+                }
                 
                 // Показываем контейнер прогресса
                 progressContainer.style.display = 'block';
+                console.log('✅ Контейнер прогресса показан');
                 
                 const total = data.total || 0;
                 const percent = data.percent || 0;
                 
                 // Обновляем прогресс-бар
-                progressBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
-                progressPercent.textContent = Math.max(0, Math.min(100, percent)) + '%';
+                if (progressBar) {
+                    progressBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+                    console.log(`📊 Прогресс-бар: ${percent}%`);
+                }
+                
+                if (progressPercent) {
+                    progressPercent.textContent = Math.max(0, Math.min(100, percent)) + '%';
+                }
                 
                 // Обновляем текст
                 if (percent === 100) {
-                    progressText.textContent = `✅ ${total} / ${total}`;
-                    progressStatus.textContent = '✅ Загрузка завершена!';
-                    currentGifName.textContent = '';
+                    if (progressText) progressText.textContent = `✅ ${total} / ${total}`;
+                    if (progressStatus) progressStatus.textContent = '✅ Загрузка завершена!';
+                    if (currentGifName) currentGifName.textContent = '';
                     
-                    // Через 2 секунды скрываем прогресс
+                    // Через 3 секунды скрываем прогресс
                     setTimeout(() => {
-                        progressContainer.style.display = 'none';
+                        if (progressContainer) {
+                            progressContainer.style.display = 'none';
+                            console.log('⏹️ Прогресс скрыт');
+                        }
                     }, 3000);
                 } else if (percent === -1) {
-                    progressStatus.textContent = '❌ Ошибка загрузки';
-                    progressText.textContent = '❌';
-                    currentGifName.textContent = 'Попробуйте снова';
+                    if (progressStatus) progressStatus.textContent = '❌ Ошибка загрузки';
+                    if (progressText) progressText.textContent = '❌';
+                    if (currentGifName) currentGifName.textContent = 'Попробуйте снова';
                 } else {
                     const current = Math.round((percent / 100) * total);
-                    progressText.textContent = `${Math.min(current, total)} / ${total}`;
-                    progressStatus.textContent = data.status || 'Загрузка GIF...';
-                    if (data.currentGif) {
+                    if (progressText) progressText.textContent = `${Math.min(current, total)} / ${total}`;
+                    if (progressStatus) progressStatus.textContent = data.status || 'Загрузка GIF...';
+                    if (data.currentGif && currentGifName) {
                         currentGifName.textContent = `📥 ${data.currentGif}`;
                     }
                 }
             });
+
+            console.log('📂 Загруженные категории:', categories);
         };
 
                 // Настройка поиска
