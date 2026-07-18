@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "2.0.0",
   "systemGifs": [
     {
       "code": ":ministitch",
@@ -436,6 +436,14 @@
     {
       "code": ":minizmr",
       "gifId": "gif_1782928055932"
+    },
+    {
+      "code": ":mini_molitva",
+      "gifId": "gif_1784402915221"
+    },
+    {
+      "code": ":minimolitva",
+      "gifId": "gif_1784402940908"
     }
   ]
 }
