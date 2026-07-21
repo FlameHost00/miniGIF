@@ -230,19 +230,21 @@ async function loadHotkey() {
 // ===== ФУНКЦИИ ДЛЯ ОБНОВЛЕНИЯ КОНТЕНТА =====
 async function checkContentUpdatesOnStart() {
     try {
-        console.log('Checking for content updates...');
+        console.log('Проверка обновлений контента...');
         const hasUpdate = await contentUpdater.checkContentUpdates();
         if (hasUpdate) {
             console.log('Content update available!');
             if (mainWindow && !mainWindow.isDestroyed()) {
+                // ПРАВИЛЬНО получаем данные из contentUpdater
                 const updateData = contentUpdater.contentUpdateData;
-                mainWindow.webContents.send('content-update-available', {
-                    version: updateData.version,
-                    count: updateData.content.systemGifs ? updateData.content.systemGifs.length : 0
-                });
+                if (updateData && updateData.newGifsCount > 0) {
+                    mainWindow.webContents.send('content-update-available', {
+                        version: updateData.version || '1.0.0',
+                        count: updateData.newGifsCount // ВАЖНО: используем newGifsCount
+                    });
+                    console.log(`📤 Отправлено уведомление: ${updateData.newGifsCount} новых GIF`);
+                }
             }
-        } else {
-            console.log('No content updates available');
         }
     } catch (error) {
         console.error('Error checking content updates:', error);
@@ -627,40 +629,44 @@ ipcMain.handle('update-gif-url', async (event, { gifId, url }) => {
 // ===== ОБРАБОТЧИКИ ДЛЯ ОБНОВЛЕНИЯ КОНТЕНТА =====
 ipcMain.handle('apply-content-update', async () => {
     try {
-        console.log('Applying content update...');
+        console.log('Применение обновления контента...');
+        const contentUpdater = require('./contentUpdater');
         const result = await contentUpdater.applyContentUpdate();
         if (result) {
             BrowserWindow.getAllWindows().forEach(win => {
                 win.webContents.send('data-updated');
             });
-            console.log('Content update applied successfully');
+            console.log('Обновление контента применено успешно');
         }
         return result;
     } catch (error) {
-        console.error('Error applying content update:', error);
+        console.error('Ошибка применения обновления:', error);
         return false;
     }
 });
 
 ipcMain.handle('check-content-updates', async () => {
     try {
-        console.log('Checking content updates...');
+        console.log('Проверка обновлений контента...');
+        const contentUpdater = require('./contentUpdater');
         return await contentUpdater.checkContentUpdates();
     } catch (error) {
-        console.error('Error checking content updates:', error);
+        console.error('Ошибка проверки обновлений:', error);
         return false;
     }
 });
 
 ipcMain.handle('generate-content-file', () => {
     try {
+        const contentUpdater = require('./contentUpdater');
         return contentUpdater.generateContentFile();
     } catch (error) {
-        console.error('Error generating content file:', error);
+        console.error('Ошибка генерации файла контента:', error);
         return null;
     }
 });
 
+// Показ уведомлений об импорте
 ipcMain.handle('show-import-notifications', async (event, newItems) => {
     try {
         if (!newItems || newItems.length === 0) {
@@ -706,7 +712,7 @@ ipcMain.handle('show-import-notifications', async (event, newItems) => {
         
         return true;
     } catch (error) {
-        console.error('Error showing import notifications:', error);
+        console.error('Ошибка показа уведомлений об импорте:', error);
         return false;
     }
 });
@@ -755,6 +761,33 @@ async function loadShortcuts() {
         return [];
     }
 }
+
+// Добавьте или замените этот обработчик в main.js
+ipcMain.handle('get-new-gifs-list', async () => {
+    try {
+        const contentUpdater = require('./contentUpdater');
+        return contentUpdater.getNewGifsList() || [];
+    } catch (error) {
+        console.error('Ошибка получения списка новых GIF:', error);
+        return [];
+    }
+});
+
+ipcMain.handle('get-content-update-data', async () => {
+    try {
+        const contentUpdater = require('./contentUpdater');
+        if (contentUpdater.contentUpdateData) {
+            return {
+                version: contentUpdater.contentUpdateData.version,
+                newGifsCount: contentUpdater.contentUpdateData.newGifsCount || 0
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Ошибка получения данных об обновлении:', error);
+        return null;
+    }
+});
 
 ipcMain.handle('load-shortcuts', async () => {
     try {

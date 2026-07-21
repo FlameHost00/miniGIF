@@ -6,91 +6,113 @@ const { app } = require('electron');
 const dataManager = require('./dataManager');
 
 const CONTENT_VERSION_FILE = path.join(app.getPath('userData'), 'content_version.json');
-const GITHUB_API_URL = 'https://api.github.com/repos/FlameHost00/miniGIF/contents/gifs_content.json';
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/FlameHost00/miniGIF/master/gifs_content.json';
 
 let contentUpdateData = null;
+let newGifsList = [];
 
-// Функция для проверки обновлений контента
 async function checkContentUpdates() {
     try {
-        // Загружаем текущую версию
-        const currentVersion = getCurrentContentVersion();
+        console.log('🔍 Проверка обновлений контента (сравнение по кодам)...');
         
-        // Получаем информацию о файле из GitHub API
-        const response = await axios.get(GITHUB_API_URL, {
+        const response = await axios.get(GITHUB_RAW_URL, {
             headers: {
-                'Accept': 'application/vnd.github.v3+json'
-            }
+                'User-Agent': 'miniGIF-App',
+                'Cache-Control': 'no-cache'
+            },
+            params: {
+                _t: Date.now()
+            },
+            timeout: 10000
         });
         
-        const githubData = response.data;
-        const remoteSha = githubData.sha;
-        const remoteVersion = JSON.parse(Buffer.from(githubData.content, 'base64').toString()).version;
+        const remoteContent = response.data;
+        const remoteVersion = remoteContent.version || '1.0.0';
+        const remoteSystemGifs = remoteContent.systemGifs || [];
         
-        // Сравниваем версии
-        if (currentVersion.version !== remoteVersion) {
-            // Есть обновление!
+        console.log(`📌 Версия на GitHub: ${remoteVersion}`);
+        console.log(`📌 Всего GIF на GitHub: ${remoteSystemGifs.length}`);
+        
+        const userData = dataManager.loadData();
+        const currentSystemItems = userData.itemsData['system_gifs'] || [];
+        console.log(`📌 Локальных GIF: ${currentSystemItems.length}`);
+        
+        const existingCodes = new Set(currentSystemItems.map(item => item.code));
+        const newItems = remoteSystemGifs.filter(item => !existingCodes.has(item.code));
+        
+        console.log(`📦 Найдено НОВЫХ элементов: ${newItems.length}`);
+        
+        if (newItems.length > 0) {
+            newGifsList = newItems.map(item => ({
+                code: item.code,
+                gifId: item.gifId,
+                gifUrl: `https://raw.githubusercontent.com/FlameHost00/miniGIF/master/gifs/${item.gifId}.gif`
+            }));
+            
             contentUpdateData = {
                 version: remoteVersion,
-                sha: remoteSha,
-                url: githubData.download_url,
-                content: JSON.parse(Buffer.from(githubData.content, 'base64').toString())
+                content: remoteContent,
+                newGifs: newItems,
+                newGifsCount: newItems.length
             };
+            
+            saveCurrentContentVersion(remoteVersion, response.headers.etag || '');
+            
+            console.log(`✅ Обновление доступно! Новых GIF: ${newItems.length}`);
             return true;
         }
         
+        console.log('ℹ️ Нет новых GIF');
         return false;
     } catch (error) {
-        console.error('Error checking content updates:', error);
+        console.error('❌ Ошибка проверки:', error.message);
         return false;
     }
 }
 
-// Функция для загрузки и применения обновления
 async function applyContentUpdate() {
-    if (!contentUpdateData) return false;
+    if (!contentUpdateData) {
+        console.error('❌ Нет данных об обновлении');
+        return false;
+    }
     
     try {
-        console.log('📥 Начинаем обновление контента...');
-        const newContent = contentUpdateData.content;
-        const userData = dataManager.loadData();
+        console.log('📥 Начинаем загрузку новых GIF...');
+        const newItems = contentUpdateData.newGifs || [];
+        const totalCount = newItems.length;
         
-        const systemCategory = userData.categories.find(c => c.id === 'system_gifs');
-        if (!systemCategory) {
-            throw new Error('Системная категория не найдена');
+        console.log(`📊 Всего новых GIF для загрузки: ${totalCount}`);
+        
+        if (totalCount === 0) {
+            console.log('ℹ️ Нет новых GIF для загрузки');
+            return true;
         }
         
-        const newSystemItems = newContent.systemGifs || [];
+        const userData = dataManager.loadData();
         const currentSystemItems = userData.itemsData['system_gifs'] || [];
-        const existingCodes = new Set(currentSystemItems.map(item => item.code));
-        const newItems = newSystemItems.filter(item => !existingCodes.has(item.code));
         
-        console.log(`📦 Новых элементов: ${newItems.length}`);
-        
-        // Отправляем начальное состояние прогресса
-        sendProgressUpdate(0, newItems.length, 'Подготовка к загрузке...', '');
+        sendProgressUpdate(0, totalCount, 'Подготовка к загрузке...', '');
         
         let downloadedCount = 0;
-        let totalCount = newItems.length;
+        let failedCount = 0;
         
-        for (let i = 0; i < newItems.length; i++) {
+        for (let i = 0; i < totalCount; i++) {
             const newItem = newItems[i];
             const gifId = newItem.gifId;
             
-            // Отправляем прогресс
-            const progress = Math.round(((i) / totalCount) * 100);
-            sendProgressUpdate(progress, totalCount, `Загрузка: ${newItem.code}`, newItem.code);
+            const percent = Math.round(((i + 1) / totalCount) * 100);
+            sendProgressUpdate(percent, totalCount, `Загрузка: ${newItem.code} (${i+1}/${totalCount})`, newItem.code);
             
             const gifUrl = `https://raw.githubusercontent.com/FlameHost00/miniGIF/master/gifs/${gifId}.gif`;
-            console.log(`📥 Скачивание (${i+1}/${totalCount}): ${gifUrl}`);
+            console.log(`📥 Скачивание (${i+1}/${totalCount}): ${newItem.code}`);
             
             const success = await dataManager.saveGif(gifId, gifUrl);
             if (success) {
                 downloadedCount++;
                 console.log(`✅ Скачан: ${newItem.code}`);
             } else {
-                console.log(`❌ Ошибка скачивания: ${newItem.code}`);
+                failedCount++;
+                console.log(`❌ Ошибка: ${newItem.code}`);
             }
             
             currentSystemItems.push({
@@ -99,75 +121,95 @@ async function applyContentUpdate() {
             });
         }
         
-        // Отправляем финальный прогресс
         sendProgressUpdate(100, totalCount, 'Загрузка завершена! ✅', '');
         
         userData.itemsData['system_gifs'] = currentSystemItems;
         dataManager.saveData(userData);
         
-        console.log(`✅ Обновление завершено! Скачано: ${downloadedCount}/${totalCount}`);
+        console.log(`✅ Загружено: ${downloadedCount}/${totalCount}, Ошибок: ${failedCount}`);
         return true;
     } catch (error) {
-        console.error('❌ Error applying content update:', error);
+        console.error('❌ Ошибка загрузки:', error.message);
         sendProgressUpdate(-1, 0, 'Ошибка загрузки', '');
         return false;
     }
 }
 
-// Функция для отправки прогресса в UI
-function sendProgressUpdate(percent, total, status, currentGif) {
-    const windows = require('electron').BrowserWindow.getAllWindows();
-    windows.forEach(win => {
-        win.webContents.send('content-update-progress', {
-            percent: percent,
-            total: total,
-            status: status,
-            currentGif: currentGif
-        });
-    });
+function getNewGifsList() {
+    return newGifsList;
 }
 
-// Функция для получения текущей версии контента
+function sendProgressUpdate(percent, total, status, currentGif) {
+    console.log(`📊 Прогресс: ${percent}%, ${total} всего`);
+    
+    try {
+        const windows = require('electron').BrowserWindow.getAllWindows();
+        windows.forEach(win => {
+            try {
+                win.webContents.send('content-update-progress', {
+                    percent: percent,
+                    total: total,
+                    status: status,
+                    currentGif: currentGif || ''
+                });
+            } catch (e) {}
+        });
+    } catch (error) {
+        console.error('Ошибка отправки прогресса:', error.message);
+    }
+}
+
 function getCurrentContentVersion() {
     try {
         if (fs.existsSync(CONTENT_VERSION_FILE)) {
             const data = JSON.parse(fs.readFileSync(CONTENT_VERSION_FILE, 'utf-8'));
-            return data;
+            return { version: data.version || '0.0.0', sha: data.sha || '' };
         }
     } catch (error) {
-        console.error('Error reading content version:', error);
+        console.error('Ошибка чтения версии:', error.message);
     }
     return { version: '0.0.0', sha: '' };
 }
 
-// Функция для сохранения версии контента
 function saveCurrentContentVersion(version, sha) {
     try {
-        fs.writeFileSync(CONTENT_VERSION_FILE, JSON.stringify({ version, sha, updatedAt: new Date().toISOString() }));
+        const data = {
+            version: version || '1.0.0',
+            sha: sha || '',
+            updatedAt: new Date().toISOString()
+        };
+        fs.writeFileSync(CONTENT_VERSION_FILE, JSON.stringify(data, null, 2));
+        console.log(`💾 Версия сохранена: ${version}`);
     } catch (error) {
-        console.error('Error saving content version:', error);
+        console.error('Ошибка сохранения версии:', error.message);
     }
 }
 
-// Функция для создания файла с контентом для GitHub
 function generateContentFile() {
-    const data = dataManager.loadData();
-    const systemItems = data.itemsData['system_gifs'] || [];
-    
-    const content = {
-        version: '1.0.0', // Увеличивайте при каждом обновлении
-        systemGifs: systemItems.map(item => ({
-            code: item.code,
-            gifId: item.gifId
-        }))
-    };
-    
-    return content;
+    try {
+        const data = dataManager.loadData();
+        const systemItems = data.itemsData['system_gifs'] || [];
+        
+        const content = {
+            version: '2.0.0',
+            systemGifs: systemItems.map(item => ({
+                code: item.code,
+                gifId: item.gifId
+            }))
+        };
+        
+        console.log(`📄 Сгенерирован файл: ${content.systemGifs.length} GIF`);
+        return content;
+    } catch (error) {
+        console.error('Ошибка генерации:', error.message);
+        return null;
+    }
 }
 
 module.exports = {
     checkContentUpdates,
     applyContentUpdate,
     getCurrentContentVersion,
-    generateContentFile
+    generateContentFile,
+    getNewGifsList
 };
