@@ -6,1048 +6,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>miniGIF - Коллекция эмоций и танцев</title>
     <style>
+        /* ===== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ===== */
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --hujlusha: #ff6b6b;
-            --bg-color: rgba(0, 0, 0, 0.95);
-            --header-bg: rgba(67, 97, 238, 0.8);
-        }
-
-        /* Новые стили для фона */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 30px;
-            background-color: #0a0a1a;
-            position: relative;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 40px;
-            font-size: 2.5rem;
-            font-weight: 600;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border-radius: 12px;
-            text-shadow: 0 0 10px var(--primary);
-            backdrop-filter: blur(5px);
-        }
-
-        h2 {
-            color: white;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 12px;
-            margin-top: 50px;
-            font-size: 1.8rem;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
-        }
-
-        .category-selector {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            position: relative;
-            padding: 12px 40px 12px 20px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            margin: 5px;
-            text-align: left;
-            overflow: visible;
-        }
-
-        .category-btn:hover {
-            background-color: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-
-        .control-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .category-btn.active {
-            background-color: var(--success);
-            color: var(--dark);
-            border: 2px solid white;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8),
-                0 4px 12px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px) scale(1.02);
-            text-shadow:
-                1px 0 0 white,
-                0 1px 0 white,
-                -1px 0 0 white,
-                0 -1px 0 white;
-        }
-
-        .category-btn:hover .delete-category-btn {
-            opacity: 1;
-        }
-
-        /* Новые стили для верхнего меню */
-        .header-menu {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--primary);
-        }
-
-        .menu-btn {
-            padding: 12px 20px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-
-        .menu-btn:hover {
-            background-color: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .data-actions-menu {
-            position: relative;
-            display: inline-block;
-        }
-
-        .data-actions-dropdown {
-            display: none;
-            position: absolute;
-            background-color: rgba(0, 0, 0, 0.9);
-            min-width: 200px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            z-index: 1;
-            border-radius: 8px;
-            border: 1px solid var(--primary);
-            padding: 10px 0;
-        }
-
-        .data-actions-dropdown button {
-            color: white;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .data-actions-dropdown button:hover {
-            background-color: rgba(67, 97, 238, 0.5);
-        }
-
-        .data-actions-menu:hover .data-actions-dropdown {
-            display: block;
-        }
-
-/* Стили для выпадающих списков категорий */
-.category-dropdown {
-    display: none;
-    position: absolute;
-    background: linear-gradient(145deg, #1a1a2e, #16213e);
-    min-width: 200px;
-    max-height: 250px;
-    overflow-y: auto;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-    z-index: 99999;
-    border-radius: 10px;
-    border: 1px solid rgba(67, 97, 238, 0.3);
-    padding: 6px 0;
-    left: 0;
-    top: 100%;
-    margin-top: 4px;
-    backdrop-filter: blur(10px);
-}
-
-.category-dropdown button {
-    color: #e0e0e0;
-    padding: 10px 18px;
-    display: block;
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
-}
-
-.category-dropdown button:hover {
-    background-color: rgba(67, 97, 238, 0.2);
-    border-left-color: var(--primary);
-    color: white;
-}
-
-.category-dropdown-container {
-    position: relative;
-    flex-grow: 1;
-}
-
-.category-dropdown-btn {
-    width: 100%;
-    padding: 6px 12px;
-    font-size: 13px;
-    border-radius: 6px;
-    border: 1px solid var(--primary);
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    text-align: left;
-    cursor: pointer;
-    position: relative;
-    padding-right: 25px;
-    transition: all 0.2s;
-    backdrop-filter: blur(5px);
-}
-
-.category-dropdown-btn::after {
-    content: "▼";
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 10px;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.category-dropdown-btn:hover {
-    border-color: var(--success);
-    background-color: rgba(67, 97, 238, 0.2);
-    box-shadow: 0 0 15px rgba(67, 97, 238, 0.2);
-}
-
-.category-dropdown-btn:hover::after {
-    opacity: 1;
-}
-
-        .move-container,
-        .copy-container {
-            position: relative;
-            width: 100%;
-        }
-
-        .action-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .action-label {
-            color: white;
-            font-weight: 500;
-            min-width: 70px;
-            /* Уменьшенная ширина */
-            text-align: left;
-            /* Выравнивание по левому краю */
-            flex-shrink: 0;
-            margin-left: -120px;
-
-        }
-
-        .action-controls {
-            flex-grow: 1;
-            display: flex;
-            gap: 5px;
-        }
-
-        .action-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .category-dropdown-container {
-            flex-grow: 1;
-            position: relative;
-            min-width: 0;
-            /* Убираем ограничение минимальной ширины */
-        }
-
-        /* Обновленные стили для цветового колеса */
-        .color-picker-container {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-top: 20px;
-        }
-
-        .color-wheel-wrapper {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .color-wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(red 0deg, yellow 60deg, lime 120deg,
-                    cyan 180deg, blue 240deg, magenta 300deg, red 360deg);
-            cursor: crosshair;
-            transition: transform 0.2s;
-        }
-
-        .color-wheel:hover {
-            transform: scale(1.02);
-        }
-
-        .color-wheel-selector {
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            border: 3px solid white;
-            border-radius: 50%;
-            pointer-events: none;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-            transform: translate(-50%, -50%);
-            z-index: 2;
-        }
-
-        .color-preview-large {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            border: 3px solid white;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .color-value {
-            color: white;
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px 12px;
-            border-radius: 6px;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-
-        .color-palette-wrapper {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: crosshair;
-        }
-
-        #colorPalette {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .palette-selector {
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            border: 3px solid white;
-            border-radius: 50%;
-            pointer-events: none;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-            transform: translate(-50%, -50%);
-            z-index: 2;
-        }
-
-        /* Увеличиваем модальное окно */
-        .modal-content {
-            max-width: 500px;
-        }
-
-        .form-row {
-            grid-template-columns: 120px 1fr;
-        }
-
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 20px;
-        }
-
-        .item-container {
-            display: grid;
-            grid-template-columns: 1fr 200px;
-            align-items: center;
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            gap: 15px;
-            border: 1px solid var(--primary);
-            position: relative;
-        }
-
-        .item-code {
-            font-family: 'Courier New', Courier, monospace;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            word-break: break-word;
-        }
-
-        .copy-btn {
-            margin-right: 12px;
-            padding: 8px 12px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .copy-btn:hover {
-            background-color: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .gif-container {
-            width: 180px;
-            height: 140px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--primary);
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .gif-container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .gif-container img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .gif-delete-btn {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: transparent url('https://cdn-icons-png.flaticon.com/512/1182/1182766.png') no-repeat center;
-            background-size: contain;
-            width: 20px;
-            height: 20px;
-            border: none;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-            padding: 0;
-        }
-
-        .gif-delete-btn:hover {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-
-        .gif-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .action-btn {
-            width: 100%;
-            padding: 8px;
-            font-size: 14px;
-        }
-
-        .move-container,
-        .copy-container {
-            display: flex;
-            width: 100%;
-            gap: 5px;
-        }
-
-        .move-btn {
-            background-color: var(--warning);
-            color: var(--dark);
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
-            min-width: 50px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .copy-btn-action {
-            background-color: var(--success);
-            color: var(--dark);
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
-            min-width: 50px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .move-select,
-        .copy-select {
-            flex-grow: 1;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid var(--primary);
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        button {
-            padding: 12px 20px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-
-        button:hover {
-            background-color: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .category {
-            margin-top: 60px;
-            display: none;
-        }
-
-        .category.active {
-            display: block;
-        }
-
-        .copied-notice {
-            position: fixed;
-            top: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--success);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            z-index: 1000;
-            display: none;
-            font-size: 16px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.4s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -15px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-        }
-
-        .add-new-form {
-            margin-top: 40px;
-            padding: 30px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--primary);
-        }
-
-        .add-new-form h3 {
-            margin-top: 0;
-            color: white;
-            font-size: 1.5rem;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
-
-        .new-category-form {
-            margin-top: 40px;
-            padding: 30px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--primary);
-        }
-
-        .new-category-form h3 {
-            margin-top: 0;
-            color: white;
-            font-size: 1.5rem;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            margin-bottom: 20px;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .form-row label {
-            font-weight: 500;
-            color: white;
-            font-size: 16px;
-        }
-
-        .form-row input,
-        .form-row select {
-            padding: 13px 16px;
-            font-size: 16px;
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            transition: all 0.2s;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-        }
-
-        .form-row input:focus,
-        .form-row select:focus {
-            border-color: var(--success);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(76, 201, 240, 0.2);
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 30px;
-            gap: 15px;
-        }
-
-        .data-actions {
-            margin-top: 40px;
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .data-actions button {
-            background-color: var(--warning);
-            color: var(--dark);
-            font-weight: 600;
-            padding: 15px 25px;
-            font-size: 16px;
-        }
-
-        .data-actions button:hover {
-            background-color: #e68a00;
-            color: white;
-        }
-
-        .category-color {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px solid white;
-        }
-
-        .color-palette {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .color-option {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .color-option.selected {
-            border-color: white;
-            transform: scale(1.1);
-        }
-
-
-        /* Стили для модального окна настроек */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 2147483647;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background-color: var(--bg-color);
-            border: 2px solid var(--primary);
-            border-radius: 10px;
-            padding: 20px;
-            width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h3 {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --primary-dark: #4834d4;
+            --success: #00b894;
+            --danger: #ff6b6b;
+            --warning: #fdcb6e;
+            --bg-dark: #0a0e1a;
+            --bg-panel: rgba(20, 27, 45, 0.95);
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --text-primary: #e8e8e8;
+            --text-secondary: #8a8fa8;
+            --text-muted: #5a5f7a;
+            --border-color: rgba(108, 92, 231, 0.15);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== БАЗОВЫЕ СТИЛИ ===== */
+        * {
             margin: 0;
-            color: white;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        /* Добавьте этот стиль в секцию стилей */
-        #toggleGifPanelBtn {
-            background-color: #8a2be2;
-            /* Фиолетовый цвет */
-            border: 2px solid white;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        #toggleGifPanelBtn:hover {
-            background-color: #9932cc;
-            /* Более темный фиолетовый при наведении */
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
-        }
-
-        .edit-category-btn {
-            background-color: rgba(76, 201, 240, 0.7);
-        }
-
-        .edit-category-btn:hover {
-            background-color: rgba(76, 201, 240, 1);
-        }
-
-        /* Иконки для кнопок меню */
-        .category-dropdown-menu button::before {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .category-dropdown-menu button.edit-btn::before {
-            content: '✎';
-        }
-
-        .category-dropdown-menu button.delete-btn::before {
-            content: '×';
-            font-weight: bold;
-        }
-
-        /* Выпадающее меню категории */
-        .category-dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: calc(100% + 5px);
-            background-color: rgba(0, 0, 0, 0.95);
-            min-width: 160px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            z-index: 10;
-            border-radius: 8px;
-            border: 1px solid var(--primary);
-            padding: 8px 0;
-        }
-
-        .category-dropdown-menu.show {
-            display: block;
-        }
-
-        .category-dropdown-menu button {
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .category-dropdown-menu button:hover {
-            background-color: rgba(67, 97, 238, 0.3);
-        }
-
-        .category-dropdown-menu button.edit-btn {
-            color: var(--success);
-        }
-
-        .category-dropdown-menu button.delete-btn {
-            color: var(--danger);
-        }
-
-        /* Кнопка меню (три точки) */
-        .category-menu-trigger {
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            border: 2px solid rgb(72, 122, 168);
-            color: rgb(72, 122, 168);
-            cursor: pointer;
-            opacity: 0.7;
-            transition: all 0.2s;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        .category-menu-trigger:hover {
-            opacity: 1;
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Стили модального меню выбора категории при экспорте */
-        .categories-checkbox-container {
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-        }
-
-        .category-checkbox-item {
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
             display: flex;
-            align-items: center;
-            margin: 8px 0;
-            padding: 8px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
+            flex-direction: column;
         }
 
-        .category-checkbox-item input {
-            margin-right: 10px;
-        }
-
-        .category-checkbox-item label {
-            flex-grow: 1;
-            color: white;
-            cursor: pointer;
-        }
-
-        .category-color-preview {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            margin-left: 10px;
-            border: 1px solid white;
-        }
-
-        /* Космический фон с светящимися линиями */
-        .space-background {
+        /* ===== КОСМИЧЕСКИЙ ФОН ===== */
+        .space-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            background: radial-gradient(ellipse at 20% 50%, #1a1a3e 0%, #0a0e1a 70%);
             overflow: hidden;
         }
 
-        /* Светящиеся линии */
-        .glowing-line {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-            transform-origin: left center;
-            animation: moveLine linear infinite;
-        }
-
-        @keyframes moveLine {
-            0% {
-                transform: translateX(-100%) rotate(0deg);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 0.8;
-            }
-
-            90% {
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: translateX(100vw) rotate(0deg);
-                opacity: 0;
-            }
-        }
-
-        /* Боковые надписи MiniNika */
-        .side-logo {
-            position: fixed;
-            font-size: 4rem;
-            font-weight: bold;
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
-            z-index: -1;
-            opacity: 0.2;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-            pointer-events: none;
-            animation: floatSide 8s ease-in-out infinite;
-        }
-
-        .side-logo.left {
-            left: 30px;
-            top: 30%;
-        }
-
-        .side-logo.right {
-            right: 30px;
-            bottom: 30%;
-        }
-
-        @keyframes floatSide {
-
-            0%,
-            100% {
-                transform: translateY(0) rotate(-2deg);
-            }
-
-            25% {
-                transform: translateY(-15px) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(0) rotate(2deg);
-            }
-
-            75% {
-                transform: translateY(15px) rotate(0deg);
-            }
-        }
-
-        /* Эффект светящихся линий для букв */
-        .side-logo::before {
-            content: "MiniNika";
-            position: absolute;
-            top: 0;
-            left: 0;
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
-            z-index: -1;
-            animation: lineGlow 3s ease-in-out infinite alternate;
-        }
-
-        @keyframes lineGlow {
-            0% {
-                opacity: 0.2;
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-            }
-
-            100% {
-                opacity: 0.4;
-                text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-            }
-        }
-
-        /* Звезды */
         .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: absolute;
             width: 100%;
             height: 100%;
-            z-index: -2;
         }
 
         .star {
@@ -1058,1246 +71,1503 @@
         }
 
         @keyframes twinkle {
-
             0%,
             100% {
                 opacity: 0.2;
                 transform: scale(0.8);
             }
-
             50% {
                 opacity: 1;
                 transform: scale(1.2);
             }
         }
 
-        /* Системное окно */
+        /* ===== ЗАГОЛОВОК ОКНА ===== */
         .title-bar {
-            background: linear-gradient(to right, #1a2a4f, #1e3a6e);
-            border-bottom: 1px solid rgba(67, 97, 238, 0.5);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            height: 30px;
+            height: 32px;
+            background: rgba(10, 14, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 10px;
-            -webkit-app-region: drag;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-
-        .window-controls {
-            -webkit-app-region: no-drag;
-            display: flex;
-        }
-
-        .window-controls button {
-            background: none;
-            border: none;
-            color: white;
-            padding: 5px 15px;
-            cursor: pointer;
-        }
-
-        .window-controls button:hover {
-            background-color: #3d3d3d;
-        }
-
-        .window-controls #close-btn:hover {
-            background-color: #e81123;
-        }
-
-        /* Кастомный скроллбар */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary) rgba(0, 0, 0, 0.3);
-        }
-
-        ::-webkit-scrollbar {
-            width: 12px;
-            height: 12px;
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-
-        ::-webkit-scrollbar-track {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 6px;
-            margin: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background-color: var(--primary);
-            border-radius: 6px;
-            border: 2px solid rgba(0, 0, 0, 0.3);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: var(--secondary);
-        }
-
-        ::-webkit-scrollbar-corner {
-            background-color: transparent;
-        }
-
-        /* Специальные стили для модальных окон и выпадающих списков */
-        .modal-content::-webkit-scrollbar,
-        .category-dropdown::-webkit-scrollbar,
-        .data-actions-dropdown::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        .modal-content::-webkit-scrollbar-track,
-        .category-dropdown::-webkit-scrollbar-track,
-        .data-actions-dropdown::-webkit-scrollbar-track {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 3px;
-        }
-
-        .modal-content::-webkit-scrollbar-thumb,
-        .category-dropdown::-webkit-scrollbar-thumb,
-        .data-actions-dropdown::-webkit-scrollbar-thumb {
-            background-color: var(--primary);
-            border-radius: 3px;
-        }
-
-        .modal-content::-webkit-scrollbar-thumb:hover,
-        .category-dropdown::-webkit-scrollbar-thumb:hover,
-        .data-actions-dropdown::-webkit-scrollbar-thumb:hover {
-            background-color: var(--secondary);
-        }
-
-        .modal-content {
-            pointer-events: auto !important;
-        }
-
-        /* Кнопка редактировать гиф */
-        .edit-btn {
-            background-color: var(--warning);
-            color: var(--dark);
-            padding: 8px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
-            min-width: 50px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .edit-btn:hover {
-            background-color: #e68a00;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .edit-controls {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .gif-edit-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .gif-url-edit {
-            width: 100%;
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid var(--primary);
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            margin-top: 5px;
-            display: none;
-        }
-
-        /* Стили для окна обновления */
-        .progress-container {
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            height: 20px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--primary);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: var(--success);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 6px;
-        }
-
-        .progress-text {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 12px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        #updateDetails {
-            color: var(--success);
-            font-size: 14px;
-            margin-top: 10px;
-            word-break: break-word;
-        }
-
-        /* Добавим стиль для кнопки проверки обновлений */
-        #checkUpdatesBtn {
-            background-color: var(--warning);
-            color: var(--dark);
-        }
-
-        #checkUpdatesBtn:hover {
-            background-color: #e68a00;
-            color: white;
-        }
-
-        /* Контейнер для описания обновления */
-        .update-description-container {
-            width: 91%;
-            max-height: 300px;
-            /* Максимальная высота с прокруткой */
-            overflow-y: auto;
-            padding: 20px;
-            margin: 15px 0;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            border: 1px solid var(--primary);
-        }
-
-        /* Стилизация текста внутри контейнера */
-        #updateDetails {
-            width: 100%;
-            line-height: 1.6;
-            color: #e0e0e0;
-        }
-
-        #updateDetails h1,
-        #updateDetails h2,
-        #updateDetails h3 {
-            color: var(--success);
-            margin: 15px 0 10px 0;
-        }
-
-        #updateDetails h2 {
-            font-size: 1.3em;
-            /* Чуть крупнее заголовки */
-            padding-bottom: 5px;
-            /* Отступ под заголовком */
-        }
-
-        #updateDetails ul {
-            padding-left: 20px;
-            margin: 10px 0;
-        }
-
-        #updateDetails li {
-            margin-bottom: 8px;
-        }
-
-        #updateDetails strong {
-            color: var(--warning);
-        }
-
-        #updateDetails em {
-            font-style: italic;
-            color: var(--success);
-        }
-
-        #updateDetails hr {
-            border: none;
-            border-top: 1px solid var(--primary);
-            margin: 15px 0;
-        }
-
-        /* Стили для опций импорта */
-        .confirm-btn {
-            background-color: var(--success) !important;
-            color: var(--dark) !important;
-            font-weight: 600;
-        }
-
-        .confirm-btn:hover {
-            background-color: #3aa8d8 !important;
-            color: white !important;
-        }
-
-        .cancel-btn {
-            background-color: var(--danger) !important;
-            color: white !important;
-        }
-
-        .cancel-btn:hover {
-            background-color: #e5176b !important;
-        }
-
-                /* Стили для уведомлений о новых импортированных элементах */
-        .import-notification-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 350px;
-        }
-
-        .import-notification {
-            background-color: rgba(0, 0, 0, 0.9);
-            border: 2px solid var(--success);
-            border-radius: 12px;
-            padding: 15px;
-            color: white;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.3s ease-out;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .import-notification.fade-out {
-            animation: fadeOut 0.3s ease-out forwards;
-        }
-
-        @keyframes fadeOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-
-        .import-notification-gif {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            border: 2px solid var(--primary);
-            object-fit: cover;
+            padding: 0 12px;
             flex-shrink: 0;
+            -webkit-app-region: drag;
+            z-index: 100;
         }
 
-        .import-notification-content {
-            flex-grow: 1;
-        }
-
-        .import-notification-category {
-            font-size: 14px;
-            color: var(--success);
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .import-notification-code {
-            font-size: 16px;
-            font-family: 'Courier New', monospace;
-            background-color: rgba(67, 97, 238, 0.3);
-            padding: 3px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 5px;
-        }
-
-        .import-notification-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0 5px;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .import-notification-close:hover {
-            opacity: 1;
-        }
-
-        /* Стили для счетчика новых элементов */
-        .import-summary-notification {
-            background: linear-gradient(135deg, var(--success), #2ecc71);
-            border: 2px solid white;
-            border-radius: 50px;
-            padding: 12px 20px;
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            margin-bottom: 10px;
-            animation: pulse 2s infinite;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(76, 201, 240, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(76, 201, 240, 0);
-            }
-        }
-
-        .import-summary-icon {
-            font-size: 24px;
-        }
-
-        .import-summary-text {
-            font-size: 16px;
-        }
-
-        .import-summary-count {
-            background-color: white;
-            color: var(--success);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-left: auto;
-        }
-
-                /* Стили для массового уведомления */
-        .import-bulk-notification {
-            background: linear-gradient(135deg, #4361ee, #3f37c9);
-            border: 2px solid white;
-            border-radius: 12px;
-            padding: 20px;
-            color: white;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.3s ease-out;
-            margin-bottom: 10px;
-            min-width: 300px;
-        }
-
-        .import-bulk-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .import-bulk-icon {
-            font-size: 24px;
-        }
-
-        .import-bulk-count {
-            background-color: white;
-            color: #4361ee;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-left: auto;
-        }
-
-        .import-bulk-categories {
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            padding-top: 15px;
-        }
-
-        .import-bulk-category {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 5px 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-        }
-
-        .import-bulk-category-name {
+        .title-bar .win-title {
+            color: var(--text-secondary);
+            font-size: 12px;
             font-weight: 500;
         }
 
-        .import-bulk-category-count {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 12px;
+        .win-controls {
+            -webkit-app-region: no-drag;
+            display: flex;
+            gap: 4px;
+        }
+
+        .win-controls button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
             font-size: 12px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Стили для системной категории */
-        .category-btn.system-category {
-            border: 2px solid #6c5ce7 !important;
-            box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+        .win-controls button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
         }
 
-        .category-btn.system-category:hover {
-            box-shadow: 0 0 25px rgba(108, 92, 231, 0.5);
+        .win-controls #close-btn:hover {
+            background: var(--danger);
+            color: white;
         }
 
-        /* Иконка замка для системной категории */
-        .category-btn.system-category::after {
-            content: ' 🔒';
-            font-size: 14px;
-            opacity: 0.7;
+        /* ===== ОСНОВНОЙ ЛЭЙАУТ ===== */
+        .app-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
-        /* Стиль для элементов в системной категории - КОМПАКТНЫЙ */
-        .item-container.system-item {
-            border-color: #6c5ce7 !important;
-            background: rgba(108, 92, 231, 0.05);
+        /* ===== БОКОВАЯ ПАНЕЛЬ ===== */
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            padding: 16px 0 12px 0;
+            overflow: hidden;
+        }
+
+        .sidebar-logo {
+            padding: 0 16px 16px 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+
+        .sidebar-logo .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-logo .logo-version {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-left: 8px;
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        /* ===== КАТЕГОРИИ ===== */
+        #categorySelector {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        #categorySelector::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #categorySelector::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        #categorySelector .category-btn-container {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            gap: 10px;
             position: relative;
-            grid-template-columns: 1fr 140px !important;  /* Уменьшаем правую колонку */
-            padding: 10px 12px !important;  /* Уменьшаем отступы */
-            gap: 8px !important;
-            min-height: 100px !important;
-            align-items: center !important;
+            margin-bottom: 2px;
+            border: 1px solid transparent;
         }
 
-        /* Иконка замка на карточке системного GIF */
-        .item-container.system-item::before {
-            content: '🔒';
+        #categorySelector .category-btn-container:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        #categorySelector .category-btn-container.active {
+            background: rgba(108, 92, 231, 0.15);
+            border-color: rgba(108, 92, 231, 0.2);
+        }
+
+        #categorySelector .category-btn-container.active::before {
+            content: '';
             position: absolute;
-            top: 8px;
-            right: 10px;
-            font-size: 12px;
-            opacity: 0.4;
-            z-index: 5;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
         }
 
-        /* Код в системной категории - компактно */
-        .item-container.system-item .item-code {
+        #categorySelector .category-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 4px 0;
+            flex: 1;
+            text-align: left;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        #categorySelector .category-btn-container .category-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #categorySelector .category-btn-container .category-count {
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1px 8px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .category-menu-trigger {
+            opacity: 0.6;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
             font-size: 16px;
-            color: #a29bfe;
-            text-shadow: 0 0 10px rgba(108, 92, 231, 0.2);
-            padding: 0 !important;
-            margin: 0 !important;
+            font-weight: bold;
+            line-height: 1;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* GIF контейнер в системной категории - меньше */
-        .item-container.system-item .gif-container {
-            width: 120px !important;
-            height: 90px !important;
-            border-radius: 8px !important;
+        #categorySelector .category-btn-container:hover .category-menu-trigger {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
-        .item-container.system-item .gif-container img {
-            object-fit: contain !important;
-        }
-
-        /* Управление в системной категории - компактно */
-        .item-container.system-item .gif-controls {
-            padding-left: 0 !important;
-            margin-left: -10px !important;  /* Сдвигаем влево */
-        }
-
-        .item-container.system-item .action-container {
-            padding-left: 0 !important;
-            margin-left: -10px !important;  /* Сдвигаем влево */
-        }
-
-        /* Сдвинуть Копировать: и кнопку влево в системной категории */
-        .item-container.system-item .action-row {
-            margin-left: -20px !important;
-        }
-
-        /* Метка "Копировать:" - компактно */
-        .item-container.system-item .action-label {
-            font-size: 13px !important;
-            min-width: 70px !important;
-            color: #a29bfe !important;
-            font-weight: 400 !important;
-        }
-
-        /* Кнопка выбора категории - компактно */
-        .item-container.system-item .category-dropdown-btn {
-            padding: 4px 12px !important;
-            padding-right: 22px !important;
-            font-size: 12px !important;
-            border-radius: 4px !important;
-            min-height: 28px !important;
-            min-width: 130px !important;  /* Увеличиваем минимальную ширину */
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe) !important;
-            border-color: #6c5ce7 !important;
+        .category-menu-trigger:hover {
+            background: rgba(108, 92, 231, 0.25) !important;
+            border-color: var(--primary) !important;
             color: white !important;
-            font-weight: 500 !important;
-            white-space: nowrap !important;
-            overflow: visible !important;  /* Меняем на visible */
-            text-overflow: clip !important;  /* Меняем на clip */
+            transform: scale(1.1);
         }
 
-        .item-container.system-item .category-dropdown-btn::after {
-            font-size: 8px !important;
-            right: 6px !important;
+        .category-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 4px 0;
+            min-width: 140px;
+            box-shadow: var(--shadow);
+            z-index: 50;
         }
 
-        .item-container.system-item .category-dropdown-btn:hover {
-            background: linear-gradient(135deg, #5a4bd1, #8c7fe6) !important;
-            box-shadow: 0 0 15px rgba(108, 92, 231, 0.3) !important;
+        .category-dropdown-menu.show {
+            display: block;
         }
 
-        /* Выпадающий список - компактно */
-        .item-container.system-item .category-dropdown {
-            min-width: 160px !important;
-            max-height: 200px !important;
-            padding: 4px 0 !important;
+        .category-dropdown-menu button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 14px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
-        .item-container.system-item .category-dropdown button {
-            padding: 6px 14px !important;
-            font-size: 12px !important;
+        .category-dropdown-menu button:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
         }
 
-        /* Контейнер для кнопки - увеличиваем */
-        .item-container.system-item .category-dropdown-container {
-            min-width: 130px !important;  /* Увеличиваем */
-            max-width: 200px !important;
-            flex-shrink: 0 !important;  /* Запрещаем сжиматься */
+        .category-dropdown-menu button.delete-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--danger);
         }
 
-        /* Скрываем лишние элементы в системной категории */
-        .item-container.system-item .edit-controls {
-            display: none !important;
+        /* ===== КНОПКИ ДЕЙСТВИЙ ===== */
+        .sidebar-actions {
+            padding: 12px 10px 0 10px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
         }
 
-        .item-container.system-item .gif-url-edit {
-            display: none !important;
+        .sidebar-actions button {
+            flex: 1;
+            min-width: 0;
+            padding: 8px 4px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-family: inherit;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: 0.2px;
         }
 
-                /* Стили для поиска */
-        .search-container {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 12px;
-            padding: 15px 20px;
-            border: 1px solid var(--primary);
-            backdrop-filter: blur(5px);
+        .sidebar-actions button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .sidebar-actions .action-primary {
+            background: rgba(108, 92, 231, 0.15);
+            border-color: rgba(108, 92, 231, 0.25);
+            color: var(--primary-light);
+        }
+
+        .sidebar-actions .action-primary:hover {
+            background: rgba(108, 92, 231, 0.25);
+            border-color: rgba(108, 92, 231, 0.4);
+            color: white;
+        }
+
+        .sidebar-actions .action-success {
+            background: rgba(0, 184, 148, 0.12);
+            border-color: rgba(0, 184, 148, 0.2);
+            color: var(--success);
+        }
+
+        .sidebar-actions .action-success:hover {
+            background: rgba(0, 184, 148, 0.2);
+            border-color: rgba(0, 184, 148, 0.35);
+            color: white;
+        }
+
+        .sidebar-actions .action-warning {
+            background: rgba(253, 203, 110, 0.12);
+            border-color: rgba(253, 203, 110, 0.2);
+            color: var(--warning);
+        }
+
+        .sidebar-actions .action-warning:hover {
+            background: rgba(253, 203, 110, 0.2);
+            border-color: rgba(253, 203, 110, 0.35);
+            color: white;
+        }
+
+        /* ===== ОСНОВНАЯ ОБЛАСТЬ ===== */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== ХЕДЕР ===== */
+        .main-header {
+            padding: 12px 24px;
+            background: rgba(10, 14, 26, 0.6);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+            min-height: 56px;
+        }
+
+        .main-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            white-space: nowrap;
         }
 
         .search-wrapper {
+            flex: 1;
             position: relative;
-            display: flex;
-            align-items: center;
+            max-width: 400px;
         }
 
-        .search-input {
+        .search-wrapper .search-input {
             width: 100%;
-            padding: 12px 45px 12px 20px;
-            font-size: 16px;
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            transition: all 0.3s ease;
+            padding: 8px 16px 8px 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 13px;
+            transition: var(--transition);
             outline: none;
         }
 
-        .search-input:focus {
-            border-color: var(--success);
-            box-shadow: 0 0 20px rgba(76, 201, 240, 0.2);
+        .search-wrapper .search-input::placeholder {
+            color: var(--text-muted);
         }
 
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+        .search-wrapper .search-input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.06);
         }
 
-        .clear-search-btn {
+        .search-wrapper .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .search-wrapper .clear-search {
             position: absolute;
             right: 10px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: white;
-            font-size: 20px;
+            color: var(--text-muted);
             cursor: pointer;
-            padding: 5px 10px;
-            opacity: 0.7;
-            transition: opacity 0.2s;
+            display: none;
+            font-size: 14px;
+            padding: 2px 6px;
         }
 
-        .clear-search-btn:hover {
-            opacity: 1;
-        }
-
-        #searchResults {
-            margin-top: 15px;
-        }
-
-        #searchResultsGrid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 20px;
-        }
-
-        /* Стили для результатов поиска */
-        .search-result-item {
-            display: grid !important;
-            grid-template-columns: 1fr 160px !important;
-            align-items: center !important;
-            gap: 10px !important;
-            padding: 12px 15px !important;
-            background-color: rgba(108, 92, 231, 0.08);
-            border-radius: 12px;
-            border: 1px solid rgba(108, 92, 231, 0.3);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .search-result-item .item-code {
-            font-family: 'Courier New', Courier, monospace;
+        .search-wrapper .clear-search:hover {
             color: white;
-            font-weight: bold;
-            font-size: 16px;
         }
 
-        .search-result-item .gif-code-display {
+        .header-actions {
             display: flex;
-            flex-direction: column;
-            gap: 5px;
+            gap: 8px;
+            margin-left: auto;
+            flex-shrink: 0;
         }
 
-        .search-result-item .search-match {
-            font-size: 12px;
-            color: var(--success);
+        #toggleGifPanelBtn {
+            padding: 8px 18px;
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            border-radius: var(--radius-sm);
+            background: rgba(108, 92, 231, 0.12);
+            color: var(--primary-light);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            white-space: nowrap;
         }
 
-        .search-result-item .gif-container {
-            width: 130px !important;
-            height: 90px !important;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
+        #toggleGifPanelBtn:hover {
+            background: rgba(108, 92, 231, 0.25);
+            border-color: rgba(108, 92, 231, 0.5);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* ===== КОНТЕНТ ===== */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* ===== КОНТЕЙНЕР КАТЕГОРИЙ ===== */
+        .category {
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .category.active {
+            display: block;
+            z-index: 2;
+        }
+
+        .category h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* ===== СЕТКА GIF ===== */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== КАРТОЧКИ ===== */
+        .item-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: visible;
+            transition: var(--transition);
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 12px;
+            padding: 12px;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .item-container:hover {
+            border-color: rgba(108, 92, 231, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.06);
+            z-index: 10;
+        }
+
+        .item-container.system-item {
+            border-color: rgba(108, 92, 231, 0.15);
+        }
+
+        .item-container .item-code {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .item-container .item-code:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--primary-light);
+        }
+
+        .item-container .gif-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-sm);
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #6c5ce7;
+            padding: 4px;
         }
 
-        .search-result-item .gif-container img {
-            max-width: 100%;
-            max-height: 100%;
+        .item-container .gif-container img {
+            width: 100%;
+            height: 100%;
             object-fit: contain;
+            transition: var(--transition);
         }
 
-        /* Кнопка в результатах поиска */
-        .search-result-item .category-dropdown-container {
-            flex: 1;
-            min-width: 100px;
+        .item-container:hover .gif-container img {
+            transform: scale(1.02);
         }
 
-        .search-result-item .category-dropdown-btn {
-            padding: 6px 12px !important;
-            padding-right: 170px !important;
-            font-size: 12px !important;
-            border-radius: 4px !important;
-            min-height: 28px !important;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe) !important;
-            border-color: #6c5ce7 !important;
-            color: white !important;
-            font-weight: 500 !important;
-            white-space: nowrap !important;
-            width: 100% !important;
-            text-align: center !important;
-            margin-left: -20px;
+        .item-container .gif-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
-        .search-result-item .category-dropdown-btn::after {
-            content: "▼" !important;
-            position: absolute !important;
-            right: 6px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            font-size: 8px !important;
-            opacity: 0.7 !important;
+        .item-container .gif-controls button {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            width: 100%;
         }
 
-        .search-result-item .category-dropdown-btn:hover {
-            background: linear-gradient(135deg, #5a4bd1, #8c7fe6) !important;
-            box-shadow: 0 0 15px rgba(108, 92, 231, 0.3) !important;
+        .item-container .gif-controls button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
-        .search-result-item .category-dropdown {
-            min-width: 150px !important;
-            max-height: 200px !important;
-            border-color: #6c5ce7 !important;
+        .item-container .gif-controls .copy-btn {
+            background: rgba(108, 92, 231, 0.12);
+            border-color: rgba(108, 92, 231, 0.2);
+            color: var(--primary-light);
         }
 
-        .search-result-item .category-dropdown button {
-            padding: 6px 12px !important;
-            font-size: 12px !important;
+        .item-container .gif-controls .copy-btn:hover {
+            background: rgba(108, 92, 231, 0.25);
+            border-color: rgba(108, 92, 231, 0.4);
+            color: white;
         }
 
-        .search-result-item .category-dropdown button:hover {
-            background-color: rgba(108, 92, 231, 0.3) !important;
+        .item-container .gif-controls .edit-btn {
+            background: rgba(253, 203, 110, 0.1);
+            border-color: rgba(253, 203, 110, 0.15);
+            color: var(--warning);
         }
 
-        .no-results {
-            text-align: center;
-            color: #888;
-            padding: 40px;
-            font-size: 18px;
+        .item-container .gif-controls .edit-btn:hover {
+            background: rgba(253, 203, 110, 0.2);
+            border-color: rgba(253, 203, 110, 0.3);
+            color: white;
         }
 
-        /* Анимация появления результатов */
-        @keyframes fadeIn {
+        .item-container .gif-controls .delete-btn {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.15);
+            color: var(--danger);
+        }
+
+        .item-container .gif-controls .delete-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: rgba(255, 107, 107, 0.3);
+            color: white;
+        }
+
+        .item-container .gif-controls .move-btn {
+            background: rgba(0, 184, 148, 0.1);
+            border-color: rgba(0, 184, 148, 0.15);
+            color: var(--success);
+        }
+
+        .item-container .gif-controls .move-btn:hover {
+            background: rgba(0, 184, 148, 0.2);
+            border-color: rgba(0, 184, 148, 0.3);
+            color: white;
+        }
+
+        .item-container .gif-delete-btn {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-muted);
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-container:hover .gif-delete-btn {
+            opacity: 1;
+        }
+
+        .item-container .gif-delete-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+/*
+        .system-item .gif-delete-btn {
+            display: none !important;
+        }
+*/
+        .system-item .gif-controls .move-btn {
+            display: none !important;
+        }
+
+        .system-item .gif-controls .edit-btn {
+            display: none !important;
+        }
+
+        .system-item .gif-controls .delete-btn {
+            display: none !important;
+        }
+
+        /* ===== РЕДАКТИРОВАНИЕ ===== */
+        .gif-url-edit {
+            display: none;
+            width: 100%;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            outline: none;
+            font-family: inherit;
+            margin-top: 4px;
+        }
+
+        .gif-url-edit:focus {
+            border-color: var(--primary);
+        }
+
+        /* ===== ВЫПАДАЮЩИЕ СПИСКИ ===== */
+        /* Общие стили для всех дропдаунов */
+        .category-dropdown {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 100%;
+            min-width: 200px;
+            max-height: 250px;
+            overflow-y: auto;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 6px 0;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            z-index: 100;
+        }
+
+        .category-dropdown-container {
+            position: relative;
+            flex-grow: 1;
+            z-index: 5;
+        }
+
+        .category-dropdown.show {
+            display: block;
+        }
+
+        .category-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 8px 14px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+            font-family: inherit;
+            border-left: 3px solid transparent;
+        }
+
+        .category-dropdown button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            border-left-color: var(--primary);
+        }
+
+        /* Стилизация скроллбара */
+        .category-dropdown::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .category-dropdown::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+        }
+
+        .category-dropdown::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .category-dropdown::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* ===== УВЕДОМЛЕНИЯ ===== */
+        .copied-notice {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(10, 14, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px 20px;
+            color: var(--text-primary);
+            font-size: 13px;
+            z-index: 1000;
+            animation: notifSlide 0.3s ease;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .copied-notice.success {
+            border-color: var(--success);
+        }
+
+        .copied-notice.error {
+            border-color: var(--danger);
+        }
+
+        @keyframes notifSlide {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateX(100%);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateX(0);
             }
         }
 
-/* Выпадающий список в поиске - ВПРАВО И ВВЕРХ */
-.search-result-item .category-dropdown-container {
-    flex: 1;
-    min-width: 100px;
-    position: relative !important;
-    overflow: visible !important;
-    z-index: 99999 !important;
-}
+        /* ===== МОДАЛЬНЫЕ ОКНА ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
 
-.search-result-item .category-dropdown {
-    display: none !important;
-    position: absolute !important;
-    left: 100% !important;      /* Вправо от кнопки */
-    bottom: 0 !important;       /* Привязан к нижнему краю кнопки */
-    min-width: 180px !important;
-    max-height: 250px !important;
-    overflow-y: auto !important;
-    background: rgba(10, 10, 30, 0.98) !important;
-    border: 2px solid #6c5ce7 !important;
-    border-radius: 10px !important;
-    padding: 6px 0 !important;
-    z-index: 9999999 !important;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.9) !important;
-    backdrop-filter: blur(20px) !important;
-    margin-left: 6px !important;
-}
+        .modal.active {
+            display: flex;
+        }
 
-.search-result-item .category-dropdown.show,
-.search-result-item .category-dropdown[style*="display: block"] {
-    display: block !important;
-}
+        .modal-content {
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
 
-.search-result-item .category-dropdown button {
-    color: #e0e0e0 !important;
-    padding: 10px 18px !important;
-    display: block !important;
-    width: 100% !important;
-    text-align: left !important;
-    background: none !important;
-    border: none !important;
-    border-left: 3px solid transparent !important;
-    cursor: pointer !important;
-    font-size: 14px !important;
-    transition: all 0.2s !important;
-}
+        .modal-content .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-.search-result-item .category-dropdown button:hover {
-    background: rgba(108, 92, 231, 0.25) !important;
-    border-left-color: #6c5ce7 !important;
-    color: white !important;
-}
+        .modal-content .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
 
-/* Убеждаемся, что родители не обрезают */
-#searchResults,
-#searchResultsGrid,
-.search-result-item,
-.search-result-item .gif-controls,
-.search-result-item .action-container {
-    overflow: visible !important;
-}
+        .modal-content .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
 
-/* Стили для прогресс-бара загрузки GIF */
-#contentUpdateProgress .progress-container {
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    height: 24px;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--primary);
-}
+        .modal-content .modal-close:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.06);
+        }
 
-#contentUpdateProgress .progress-bar {
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s ease;
-    border-radius: 6px;
-    background: linear-gradient(90deg, #6c5ce7, #a29bfe);
-}
+        .modal-content .form-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
 
-#contentUpdateProgress .progress-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 12px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    font-weight: bold;
-}
+        .modal-content .form-row label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
 
-#contentUpdateProgress #progressStatus {
-    color: #a29bfe;
-}
+        .modal-content .form-row input,
+        .modal-content .form-row select {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: var(--transition);
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+        }
 
-#contentUpdateProgress #currentGifName {
-    color: #888;
-    font-size: 12px;
-    min-height: 18px;
-    display: inline-block;
-}
+        .modal-content .form-row input:focus,
+        .modal-content .form-row select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.06);
+        }
 
-/* Анимация для появления GIF в предпросмотре */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
+        .modal-content .form-row select option {
+            background: #1a1a3e;
+        }
 
-/* Стили для сетки предпросмотра */
-#previewGifsGrid {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary) rgba(0,0,0,0.3);
-}
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
 
-#previewGifsGrid::-webkit-scrollbar {
-    width: 6px;
-}
+        .modal-footer button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
 
-#previewGifsGrid::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.2);
-    border-radius: 3px;
-}
+        .modal-footer .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
 
-#previewGifsGrid::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 3px;
-}
-        
+        .modal-footer .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .modal-footer .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+        }
+
+        .modal-footer .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .modal-footer .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-footer .btn-danger:hover {
+            background: #e55a5a;
+        }
+
+        .modal-footer .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .modal-footer .btn-success:hover {
+            background: #00a381;
+        }
+
+        /* ===== ЦВЕТОВОЕ КОЛЕСО ===== */
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .color-palette-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: crosshair;
+            border: 2px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .color-palette-wrapper canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .palette-selector {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 2px solid white;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .color-preview-large {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border-color);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        /* ===== ИМПОРТ УВЕДОМЛЕНИЯ ===== */
+        .import-notification-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 320px;
+        }
+
+        .import-notification {
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: notifSlide 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .import-notification .notif-gif {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .import-notification .notif-content {
+            flex: 1;
+        }
+
+        .import-notification .notif-category {
+            font-size: 11px;
+            color: var(--primary-light);
+            font-weight: 500;
+        }
+
+        .import-notification .notif-code {
+            font-size: 13px;
+            font-family: 'SF Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        .import-notification .notif-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 4px;
+        }
+
+        .import-notification .notif-close:hover {
+            color: white;
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 56px;
+                min-width: 56px;
+                padding: 8px 0;
+            }
+
+            .sidebar-logo .logo-text,
+            .sidebar-logo .logo-version {
+                display: none;
+            }
+
+            #categorySelector .category-btn-container .category-count {
+                display: none;
+            }
+
+            #categorySelector .category-btn-container .category-btn {
+                display: none;
+            }
+
+            #categorySelector .category-btn-container .category-color {
+                margin: 0 auto;
+            }
+
+            .category-menu-trigger {
+                display: none !important;
+            }
+
+            .sidebar-actions button span {
+                display: none;
+            }
+
+            .sidebar-actions button {
+                min-width: 32px;
+                padding: 6px;
+                font-size: 14px;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .item-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+
+            .item-container .gif-container {
+                aspect-ratio: 16/9;
+            }
+
+            .main-header {
+                padding: 10px 16px;
+                flex-wrap: wrap;
+            }
+
+            .search-wrapper {
+                max-width: 100%;
+                order: 3;
+                flex-basis: 100%;
+            }
+
+            .main-content {
+                padding: 12px 16px;
+            }
+
+            .modal-content {
+                margin: 12px;
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .items-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .item-container .item-code {
+                font-size: 13px;
+            }
+        }
+
+        /* выпадающее меню Импорт/Экспорт */
+
+        .import-export-menu {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 4px 0;
+            min-width: 160px;
+            box-shadow: var(--shadow);
+            z-index: 50;
+            margin-bottom: 4px;
+        }
+
+        .import-export-menu.show {
+            display: block;
+        }
+
+        .import-export-menu button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 14px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .import-export-menu button:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
     </style>
 </head>
 
 <body>
+    <!-- ===== КОСМИЧЕСКИЙ ФОН ===== -->
+    <div class="space-bg">
+        <div class="stars" id="stars"></div>
+    </div>
+
+    <!-- ===== ЗАГОЛОВОК ОКНА ===== -->
     <div class="title-bar">
-        <div class="title"></div>
-        <div class="window-controls">
-            <button id="minimize-btn">—</button>
-            <button id="maximize-btn">□</button>
-            <button id="close-btn">×</button>
+        <span class="win-title">MiniNika♡_♡</span>
+        <div class="win-controls">
+            <button id="minimize-btn">─</button>
+            <button id="maximize-btn">☐</button>
+            <button id="close-btn">✕</button>
         </div>
     </div>
 
-    <!-- Космический фон -->
-    <div class="space-background">
-        <div class="stars" id="stars"></div>
-        <div class="side-logo left">MiniNika</div>
-        <div class="side-logo right">MiniNika</div>
+    <!-- ===== ОСНОВНОЙ ЛЭЙАУТ ===== -->
+    <div class="app-layout">
+        <!-- ===== БОКОВАЯ ПАНЕЛЬ ===== -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-text">Мои Категории</span>
+            </div>
+
+            <!-- Список категорий (ID НЕ ИЗМЕНЁН) -->
+            <div id="categorySelector">
+                <!-- Категории будут добавлены динамически -->
+            </div>
+
+            <!-- КНОПКИ ДЕЙСТВИЙ (ВСЕ ID СОХРАНЕНЫ) -->
+            <div class="sidebar-actions">
+                <!-- Первая секция: Добавление -->
+                <div class="sidebar-actions-group" style="display: flex; gap: 4px; width: 100%; flex-wrap: wrap; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color);">
+                    <button id="openAddGifModal" class="action-primary" style="flex: 1;" title="Добавить GIF">Добавить GIF</button>
+                    <button id="openAddCategoryModal" style="flex: 1;" title="Добавить Категорию">Добавить Кат.</button>
+                </div>
+                <!-- Вторая секция: Импорт/Экспорт -->
+                <div class="sidebar-actions-group" style="display: flex; gap: 4px; width: 100%; flex-wrap: wrap; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color);">
+                    <button id="importBtn" class="action-success" style="flex: 1;" title="Импорт GIF">Импорт</button>
+                    <button id="exportBtn" class="action-success" style="flex: 1;" title="Экспорт GIF">Экспорт</button>
+                </div>
+                <!-- Третья секция: Обновления -->
+                <div class="sidebar-actions-group" style="display: flex; gap: 4px; width: 100%; flex-wrap: wrap;">
+                    <button id="checkUpdatesBtn" class="action-warning" style="flex: 1;" title="Обновить Приложение">Обновить Пр.</button>
+                    <button id="checkContentBtn" class="action-primary" style="flex: 1;" title="Новые GIF">Новые GIF</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== ОСНОВНАЯ ОБЛАСТЬ ===== -->
+        <main class="main-area">
+            <header class="main-header">
+
+                <!-- Поиск (ID НЕ ИЗМЕНЁН) -->
+                <div class="search-wrapper" id="systemSearchContainer" style="display: none;">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" id="systemSearchInput" placeholder="Поиск GIF по коду...">
+                    <button class="clear-search" id="clearSearchBtn">✕</button>
+                </div>
+
+                <div class="header-actions">
+                    <button id="toggleGifPanelBtn">📌 GIF Панель</button>
+                </div>
+            </header>
+
+            <div class="main-content">
+                <!-- Контейнер категорий (ID НЕ ИЗМЕНЁН) -->
+                <div id="listContainer">
+                    <!-- Категории будут добавлены динамически -->
+                </div>
+            </div>
+        </main>
     </div>
 
-    <h1>Коллекция эмоций и танцев</h1>
+    <!-- ===== УВЕДОМЛЕНИЕ (ID НЕ ИЗМЕНЁН) ===== -->
     <div class="copied-notice" id="copiedNotice">Скопировано!</div>
 
+    <!-- ===== КОНТЕЙНЕР УВЕДОМЛЕНИЙ ОБ ИМПОРТЕ ===== -->
     <div class="import-notification-container" id="importNotificationContainer"></div>
 
-        <!-- Модальное окно предпросмотра новых GIF -->
-    <div id="previewNewGifsModal" class="modal">
-        <div class="modal-content" style="width: 700px; max-width: 90vw;">
-            <div class="modal-header">
-                <h3 style="color: var(--success);">✨ Новые GIF добавлены!</h3>
-                <button class="close-modal" onclick="closeModal('previewNewGifsModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="color: white; margin-bottom: 15px;">
-                    Добавлено <span id="previewTotalCount" style="color: var(--success); font-weight: bold;">0</span> новых GIF:
-                </p>
-                <div id="previewGifsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; max-height: 400px; overflow-y: auto; padding: 10px;">
-                    <!-- GIF будут добавлены динамически -->
-                </div>
-            </div>
-            <div class="modal-footer" style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
-                <button onclick="closeModal('previewNewGifsModal')" class="confirm-btn">Отлично! 🎉</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Верхнее меню -->
-    <div class="header-menu">
-        <button id="toggleGifPanelBtn" class="menu-btn">Открыть GIF панель</button>
-        <button id="openAddGifModal" class="menu-btn">+ Добавить GIF</button>
-        <button id="openAddCategoryModal" class="menu-btn">+ Добавить категорию</button>
-        <button id="checkUpdatesBtn" class="menu-btn">Проверить обновления</button>
-        <button id="checkContentBtn" class="menu-btn">🔄 Проверить новые GIF</button>
-
-        <div class="data-actions-menu">
-            <button class="menu-btn">Экспорт/Импорт GIF ▼</button>
-            <div class="data-actions-dropdown">
-                <button id="exportBtn">Экспорт GIF</button>
-                <button id="importBtn">Импорт GIF</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Поиск в системной категории -->
-    <div class="search-container" id="systemSearchContainer" style="display: none; margin-bottom: 20px;">
-        <div class="search-wrapper">
-            <input type="text" id="systemSearchInput" placeholder="🔍 Поиск GIF по коду..." class="search-input">
-            <button id="clearSearchBtn" class="clear-search-btn" style="display: none;">✕</button>
-        </div>
-        <div id="searchResults" style="display: none; margin-top: 10px;">
-            <div id="searchResultsGrid" class="items-grid"></div>
-        </div>
-    </div>
-
-    <div class="category-selector" id="categorySelector">
-        <!-- Категории будут добавляться динамически -->
-    </div>
-
-    <div id="listContainer">
-        <!-- Категории будут добавляться динамически -->
-    </div>
-
-    <!-- Модальное окно обновления -->
-    <div id="updateModal" class="modal">
-        <div class="modal-content" style="width: 500px;">
-            <div class="modal-header">
-                <h3>Доступно обновление</h3>
-                <button class="close-modal" onclick="closeModal('updateModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-row">
-                    <label id="updateStatus">Проверка обновлений...</label>
-                </div>
-                <div class="update-description-container">
-                    <div id="updateDetails">
-                        <!-- Содержимое будет вставлено автоматически -->
-                    </div>
-                </div>
-                <div class="progress-container" id="updateProgress" style="display: none;">
-                    <div class="progress-bar" id="progressBar"></div>
-                    <div class="progress-text" id="progressText">0%</div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="downloadUpdateBtn" style="display: none;">Загрузить обновление</button>
-                <button id="installUpdateBtn" style="display: none;">Установить обновление</button>
-                <button id="remindLaterBtn" class="cancel-btn">Напомнить позже</button>
-            </div>
-        </div>
-    </div>
-
-   
-    <!-- Модальное окно загрузки новых GIF -->
-    <div id="gifDownloadModal" class="modal">
-        <div class="modal-content" style="width: 450px;">
-            <div class="modal-header">
-                <h3 style="color: var(--success);">📥 Загрузка новых GIF</h3>
-                <button class="close-modal" onclick="closeModal('gifDownloadModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="gifDownloadProgress" style="margin-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span style="color: white; font-size: 13px;" id="gifProgressStatus">Подготовка...</span>
-                        <span style="color: white; font-size: 13px;" id="gifProgressPercent">0%</span>
-                    </div>
-                    <div class="progress-container" style="height: 24px;">
-                        <div class="progress-bar" id="gifProgressBar" style="width: 0%; background: linear-gradient(90deg, #6c5ce7, #a29bfe);"></div>
-                        <div class="progress-text" id="gifProgressText">0 / 0</div>
-                    </div>
-                    <div style="margin-top: 8px; text-align: center;">
-                        <span style="color: #888; font-size: 12px;" id="gifCurrentName">Подготовка...</span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="gifCloseBtn" class="cancel-btn" style="display: none;">Закрыть</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно подтверждения -->
-    <div id="confirmModal" class="modal">
-        <div class="modal-content" style="width: 400px;">
+    <!-- ===== МОДАЛЬНЫЕ ОКНА (ВСЕ ID СОХРАНЕНЫ) ===== -->
+    <!-- ПОДТВЕРЖДЕНИЕ -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 id="confirmModalTitle">Подтверждение</h3>
-                <button class="close-modal" onclick="closeConfirmModal()">&times;</button>
+                <button class="modal-close" onclick="closeConfirmModal()">✕</button>
             </div>
             <div class="modal-body">
-                <p id="confirmModalMessage">Вы уверены?</p>
+                <p id="confirmModalMessage" style="color: var(--text-secondary);">Вы уверены?</p>
             </div>
             <div class="modal-footer">
-                <button id="confirmModalYes" class="confirm-btn">Да</button>
-                <button id="confirmModalNo" class="cancel-btn">Нет</button>
+                <button class="btn-secondary" id="confirmModalNo">Отмена</button>
+                <button class="btn-primary" id="confirmModalYes">Да</button>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно для добавления гифки -->
-    <div id="addGifModal" class="modal">
+    <!-- ДОБАВЛЕНИЕ GIF -->
+    <div class="modal" id="addGifModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Добавить новый элемент</h3>
-                <button class="close-modal">&times;</button>
+                <button class="modal-close" onclick="closeModal('addGifModal')">✕</button>
             </div>
             <div class="modal-body">
                 <div class="form-row">
-                    <label for="newCategory">Категория:</label>
+                    <label for="newCategory">Категория</label>
                     <select id="newCategory"></select>
                 </div>
                 <div class="form-row">
-                    <label for="newCode">Код:</label>
-                    <input type="text" id="newCode" tabindex="0" placeholder=":minipoka">
+                    <label for="newCode">Код</label>
+                    <input type="text" id="newCode" placeholder=":minipoka">
                 </div>
                 <div class="form-row">
-                    <label for="newGifUrl">URL GIF:</label>
-                    <input type="text" id="newGifUrl" tabindex="0" placeholder="https://example.com/image.gif">
+                    <label for="newGifUrl">URL GIF</label>
+                    <input type="text" id="newGifUrl" placeholder="https://example.com/image.gif">
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="addNewBtn">Добавить</button>
-                <button class="cancel-btn">Отмена</button>
+                <button class="btn-secondary" onclick="closeModal('addGifModal')">Отмена</button>
+                <button class="btn-primary" id="addNewBtn">Добавить</button>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно для редактирования категории -->
-    <div id="editCategoryModal" class="modal">
-        <div class="modal-content" style="width: 500px;">
-            <div class="modal-header">
-                <h3>Редактировать категорию</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-row">
-                    <label for="editCategoryName">Название:</label>
-                    <input type="text" id="editCategoryName" tabindex="0" placeholder="Название категории">
-                </div>
-                <div class="form-row">
-                    <label>Цвет:</label>
-                    <div class="color-picker-container">
-                        <div class="color-palette-wrapper">
-                            <canvas id="editColorPalette" width="220" height="220"></canvas>
-                            <div class="palette-selector" id="editPaletteSelector"></div>
-                        </div>
-                        <div class="color-preview-large" id="editColorPreview">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="saveCategoryBtn">Сохранить</button>
-                <button class="cancel-btn">Отмена</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для добавления категории (обновлено с цветовым колесом) -->
-    <div id="addCategoryModal" class="modal">
-        <div class="modal-content" style="width: 500px;">
+    <!-- ДОБАВЛЕНИЕ КАТЕГОРИИ -->
+    <div class="modal" id="addCategoryModal">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3>Создать новую категорию</h3>
-                <button class="close-modal">&times;</button>
+                <button class="modal-close" onclick="closeModal('addCategoryModal')">✕</button>
             </div>
             <div class="modal-body">
                 <div class="form-row">
-                    <label for="newCategoryName">Название:</label>
+                    <label for="newCategoryName">Название</label>
                     <input type="text" id="newCategoryName" placeholder="Моя новая категория">
                 </div>
                 <div class="form-row">
-                    <label>Цвет:</label>
+                    <label>Цвет</label>
                     <div class="color-picker-container">
                         <div class="color-palette-wrapper">
-                            <canvas id="colorPalette" width="220" height="220"></canvas>
+                            <canvas id="colorPalette" width="180" height="180"></canvas>
                             <div class="palette-selector" id="paletteSelector"></div>
                         </div>
-                        <div class="color-preview-large" id="colorPreview">
-                        </div>
+                        <div class="color-preview-large" id="colorPreview"></div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="createCategoryBtn">Создать</button>
-                <button class="cancel-btn">Отмена</button>
+                <button class="btn-secondary" onclick="closeModal('addCategoryModal')">Отмена</button>
+                <button class="btn-primary" id="createCategoryBtn">Создать</button>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно для выбора категории при экспорте-->
-    <div id="exportModal" class="modal">
+    <!-- РЕДАКТИРОВАНИЕ КАТЕГОРИИ -->
+    <div class="modal" id="editCategoryModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Экспорт данных</h3>
-                <button class="close-modal">&times;</button>
+                <h3>Редактировать категорию</h3>
+                <button class="modal-close" onclick="closeModal('editCategoryModal')">✕</button>
             </div>
             <div class="modal-body">
                 <div class="form-row">
-                    <label>Выберите категории для экспорта:</label>
-                    <div class="categories-checkbox-container">
-                        <!-- Категории будут добавлены динамически -->
+                    <label for="editCategoryName">Название</label>
+                    <input type="text" id="editCategoryName" placeholder="Название категории">
+                </div>
+                <div class="form-row">
+                    <label>Цвет</label>
+                    <div class="color-picker-container">
+                        <div class="color-palette-wrapper">
+                            <canvas id="editColorPalette" width="180" height="180"></canvas>
+                            <div class="palette-selector" id="editPaletteSelector"></div>
+                        </div>
+                        <div class="color-preview-large" id="editColorPreview"></div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="confirmExportBtn">Экспортировать выбранное</button>
-                <button class="cancel-btn">Отмена</button>
+                <button class="btn-secondary" onclick="closeModal('editCategoryModal')">Отмена</button>
+                <button class="btn-primary" id="saveCategoryBtn">Сохранить</button>
             </div>
         </div>
     </div>
 
-    <!-- модальное окно для импорта -->
-    <div id="importConfirmModal" class="modal">
-        <div class="modal-content" style="width: 500px;">
+    <!-- ЭКСПОРТ -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h3>Импорт данных</h3>
-                <button class="close-modal" onclick="closeModal('importConfirmModal')">&times;</button>
+                <h3>Экспорт данных</h3>
+                <button class="modal-close" onclick="closeModal('exportModal')">✕</button>
             </div>
             <div class="modal-body">
-                <p>Импортировать данные? Существующие данные не будут удалены, а объединятся с импортированными.</p>
+                <div class="form-row">
+                    <label>Выберите категории для экспорта</label>
+                    <div class="categories-checkbox-container" id="exportCategoriesList"></div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button id="confirmImportBtn" class="confirm-btn">Импортировать</button>
-                <button class="cancel-btn" onclick="closeModal('importConfirmModal')">Отмена</button>
+                <button class="btn-secondary" onclick="closeModal('exportModal')">Отмена</button>
+                <button class="btn-primary" id="confirmExportBtn">Экспортировать выбранное</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ИМПОРТ -->
+    <div class="modal" id="importConfirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Импорт данных</h3>
+                <button class="modal-close" onclick="closeModal('importConfirmModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary);">Импортировать данные? Существующие данные не будут удалены, а объединятся с импортированными.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('importConfirmModal')">Отмена</button>
+                <button class="btn-success" id="confirmImportBtn">Импортировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПРЕДПРОСМОТР НОВЫХ GIF -->
+    <div class="modal" id="previewNewGifsModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 style="color: var(--success);">✨ Новые GIF добавлены!</h3>
+                <button class="modal-close" onclick="closeModal('previewNewGifsModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                    Добавлено <span id="previewTotalCount" style="color: var(--primary-light); font-weight: 600;">0</span> новых GIF:
+                </p>
+                <div id="previewGifsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; max-height: 400px; overflow-y: auto; padding: 4px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-success" onclick="closeModal('previewNewGifsModal')">Отлично! 🎉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ОБНОВЛЕНИЕ ПРИЛОЖЕНИЯ -->
+    <div class="modal" id="updateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Доступно обновление</h3>
+                <button class="modal-close" onclick="closeModal('updateModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="updateStatus" style="color: var(--text-secondary);">Проверка обновлений...</p>
+                <div id="updateDetails" style="margin: 12px 0; padding: 12px; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); max-height: 200px; overflow-y: auto; font-size: 13px; color: var(--text-secondary);"></div>
+                <div class="progress-container" id="updateProgress" style="display: none; margin-top: 12px;">
+                    <div class="progress-bar" id="progressBar" style="height: 4px; background: var(--primary); border-radius: 4px; width: 0%; transition: width 0.3s;"></div>
+                    <div class="progress-text" id="progressText" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">0%</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="remindLaterBtn">Напомнить позже</button>
+                <button class="btn-primary" id="downloadUpdateBtn" style="display: none;">Загрузить</button>
+                <button class="btn-success" id="installUpdateBtn" style="display: none;">Установить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЗАГРУЗКА НОВЫХ GIF -->
+    <div class="modal" id="gifDownloadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="color: var(--success);">📥 Загрузка новых GIF</h3>
+                <button class="modal-close" onclick="closeModal('gifDownloadModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="gifDownloadProgress">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="color: var(--text-secondary); font-size: 13px;" id="gifProgressStatus">Подготовка...</span>
+                        <span style="color: var(--text-secondary); font-size: 13px;" id="gifProgressPercent">0%</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;">
+                        <div id="gifProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); transition: width 0.3s;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+                        <span style="color: var(--text-muted); font-size: 12px;" id="gifProgressText">0 / 0</span>
+                        <span style="color: var(--text-muted); font-size: 12px;" id="gifCurrentName"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="gifCloseBtn" style="display: none;" onclick="closeModal('gifDownloadModal')">Закрыть</button>
             </div>
         </div>
     </div>
@@ -2744,7 +2014,7 @@
                 console.log('⚠️ Создаем временную системную категорию');
                 category = {
                     id: 'system_gifs',
-                    name: '📦 Системные GIF',
+                    name: 'Системные GIF',
                     key: 'system-gifs',
                     color: '#6c5ce7',
                     isSystem: true
@@ -2844,7 +2114,7 @@
                 let actionsHtml = '';
                 
                 if (isSystem) {
-                    // СИСТЕМНАЯ КАТЕГОРИЯ: только копирование - КОМПАКТНЫЙ ВИД
+                    // СИСТЕМНАЯ КАТЕГОРИЯ: копирование + удаление
                     let dropdownOptions = '';
                     otherCategories.forEach(c => {
                         dropdownOptions += `<button onclick="copyItem('${categoryId}', ${index}, '${c.id}')">${c.name}</button>`;
@@ -2873,8 +2143,7 @@
                         </div>
                     `;
                 } else {
-                    // ОБЫЧНАЯ КАТЕГОРИЯ: все функции без копирования
-                    // ИСКЛЮЧАЕМ СИСТЕМНУЮ КАТЕГОРИЮ из списка для перемещения
+                    // ОБЫЧНАЯ КАТЕГОРИЯ: все функции
                     let moveOptions = '';
                     const availableCategories = otherCategories.filter(c => !isSystemCategory(c.id));
                     availableCategories.forEach(c => {
@@ -2911,7 +2180,9 @@
                     `;
                 }
 
-                const deleteBtn = `<button class="gif-delete-btn" onclick="deleteItem('${categoryId}', ${index})"></button>`;
+                // ===== КНОПКА УДАЛЕНИЯ — ТЕПЕРЬ ДЛЯ ВСЕХ КАТЕГОРИЙ =====
+                const deleteBtn = `<button class="gif-delete-btn" onclick="deleteItem('${categoryId}', ${index})">✕</button>`;
+                
                 const editInput = isSystem ? '' : `<input type="text" id="code-edit-${categoryId}-${index}" value="${item.code}" style="display: none; width: 100%; padding: 5px; border-radius: 4px; border: 1px solid ${category.color}; background-color: rgba(0,0,0,0.5); color: white;">`;
                 const codeStyle = isSystem ? 'font-size: 18px;' : '';
 
@@ -2958,38 +2229,9 @@
 
         // Генерация светящихся линий
         function createGlowingLines() {
-            const background = document.querySelector('.space-background');
+            const background = document.querySelector('.space-bg');
             if (!background) return;
             
-            const linesCount = 15;
-
-            for (let i = 0; i < linesCount; i++) {
-                const line = document.createElement('div');
-                line.className = 'glowing-line';
-
-                const width = 50 + Math.random() * 150;
-                const height = 1 + Math.random() * 2;
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                const angle = -30 + Math.random() * 60;
-                const duration = 10 + Math.random() * 20 + 's';
-                const delay = Math.random() * 15 + 's';
-
-                line.style.width = `${width}px`;
-                line.style.height = `${height}px`;
-                line.style.left = `${x}%`;
-                line.style.top = `${y}%`;
-                line.style.transform = `rotate(${angle}deg)`;
-                line.style.animationDuration = duration;
-                line.style.animationDelay = delay;
-
-                background.appendChild(line);
-            }
-        }
-
-        // Генерация светящихся линий
-        function createGlowingLines() {
-            const background = document.querySelector('.space-background');
             const linesCount = 15;
 
             for (let i = 0; i < linesCount; i++) {
@@ -3031,86 +2273,196 @@
                 const container = document.createElement('div');
                 container.className = 'category-btn-container';
                 container.style.position = 'relative';
-                container.style.display = 'inline-block';
+                container.style.display = 'flex';  // Изменено с inline-block на flex
+                container.style.alignItems = 'center';
+                container.style.width = '100%';
+                container.style.padding = '6px 10px';
+                container.style.borderRadius = 'var(--radius-sm)';
+                container.style.cursor = 'pointer';
+                container.style.transition = 'var(--transition)';
+                container.style.gap = '10px';
+                container.style.border = '1px solid transparent';
 
+                // Цветной индикатор
+                const colorDot = document.createElement('span');
+                colorDot.className = 'category-color';
+                colorDot.style.width = '10px';
+                colorDot.style.height = '10px';
+                colorDot.style.borderRadius = '50%';
+                colorDot.style.flexShrink = '0';
+                colorDot.style.border = '1px solid rgba(255,255,255,0.1)';
+                colorDot.style.backgroundColor = category.color;
+
+                // Кнопка категории
                 const btn = document.createElement('button');
                 btn.className = 'category-btn';
                 btn.textContent = category.name;
                 btn.dataset.category = category.key;
-                btn.style.backgroundColor = category.color;
+                btn.style.background = 'none';
+                btn.style.border = 'none';
+                btn.style.color = 'var(--text-primary)';
+                btn.style.fontSize = '13px';
+                btn.style.cursor = 'pointer';
+                btn.style.padding = '4px 0';
+                btn.style.flex = '1';
+                btn.style.textAlign = 'left';
+                btn.style.fontFamily = 'inherit';
 
                 const isSystem = category.isSystem || isSystemCategory(category.id);
 
-                // Для системной категории добавляем специальный класс и тултип
                 if (isSystem) {
-                    btn.classList.add('system-category');
+                    btn.style.color = 'var(--primary-light)';
                     btn.title = 'Системная категория (нельзя изменить)';
-                    btn.style.opacity = '0.9';
-                    btn.style.border = '2px solid #6c5ce7';
+                    // Заменяем 📦 на 🔒
+                    const lockIcon = document.createElement('span');
+                    lockIcon.textContent = '🔒';
+                    lockIcon.style.color = '#ff6b6b';
+                    lockIcon.style.fontSize = '12px';
+                    lockIcon.style.marginLeft = '4px';
+                    btn.appendChild(lockIcon);
                 }
 
-                const menuTrigger = document.createElement('button');
-                menuTrigger.className = 'category-menu-trigger';
-                menuTrigger.innerHTML = '⋮';
-                menuTrigger.title = 'Действия с категорией';
+                // Количество
+                const countSpan = document.createElement('span');
+                countSpan.className = 'category-count';
+                const items = getCategoryData(category.id);
+                countSpan.textContent = items.length;
+                countSpan.style.fontSize = '11px';
+                countSpan.style.color = 'var(--text-muted)';
+                countSpan.style.background = 'rgba(255,255,255,0.05)';
+                countSpan.style.padding = '1px 8px';
+                countSpan.style.borderRadius = '10px';
+                countSpan.style.flexShrink = '0';
 
-                // Скрываем меню для системной категории
-                if (isSystem) {
-                    menuTrigger.style.display = 'none';
-                }
+                // Меню (три точки) - только для НЕ системных
+                let menuTrigger = null;
+                if (!isSystem) {
+                    menuTrigger = document.createElement('button');
+                    menuTrigger.className = 'category-menu-trigger';
+                    menuTrigger.innerHTML = '⋮';
+                    menuTrigger.title = 'Действия с категорией';
+                    menuTrigger.style.background = 'none';
+                    menuTrigger.style.border = 'none';
+                    menuTrigger.style.color = 'var(--text-muted)';
+                    menuTrigger.style.cursor = 'pointer';
+                    menuTrigger.style.padding = '2px 6px';
+                    menuTrigger.style.borderRadius = '4px';
+                    menuTrigger.style.transition = 'var(--transition)';
+                    menuTrigger.style.fontSize = '14px';
+                    menuTrigger.style.opacity = '0';
 
-                const dropdownMenu = document.createElement('div');
-                dropdownMenu.className = 'category-dropdown-menu';
-                dropdownMenu.style.display = 'none';
-
-                menuTrigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    document.querySelectorAll('.category-dropdown-menu').forEach(menu => {
-                        if (menu !== dropdownMenu) menu.style.display = 'none';
-                    });
-                    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-                });
-
-                const editBtn = document.createElement('button');
-                editBtn.className = 'edit-btn';
-                editBtn.textContent = 'Редактировать';
-                editBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
+                    const dropdownMenu = document.createElement('div');
+                    dropdownMenu.className = 'category-dropdown-menu';
                     dropdownMenu.style.display = 'none';
-                    if (!isSystem) {
+                    dropdownMenu.style.position = 'absolute';
+                    dropdownMenu.style.right = '0';
+                    dropdownMenu.style.top = '100%';
+                    dropdownMenu.style.background = 'var(--bg-panel)';
+                    dropdownMenu.style.backdropFilter = 'blur(20px)';
+                    dropdownMenu.style.border = '1px solid var(--border-color)';
+                    dropdownMenu.style.borderRadius = 'var(--radius-sm)';
+                    dropdownMenu.style.padding = '4px 0';
+                    dropdownMenu.style.minWidth = '140px';
+                    dropdownMenu.style.boxShadow = 'var(--shadow)';
+                    dropdownMenu.style.zIndex = '50';
+
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = '✏️ Редактировать';
+                    editBtn.style.display = 'flex';
+                    editBtn.style.alignItems = 'center';
+                    editBtn.style.gap = '8px';
+                    editBtn.style.width = '100%';
+                    editBtn.style.padding = '8px 14px';
+                    editBtn.style.background = 'none';
+                    editBtn.style.border = 'none';
+                    editBtn.style.color = 'var(--text-secondary)';
+                    editBtn.style.fontSize = '13px';
+                    editBtn.style.cursor = 'pointer';
+                    editBtn.style.transition = 'var(--transition)';
+                    editBtn.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.05)'; this.style.color = 'white'; };
+                    editBtn.onmouseout = function() { this.style.background = 'none'; this.style.color = 'var(--text-secondary)'; };
+                    editBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        dropdownMenu.style.display = 'none';
                         openEditCategoryModal(category);
-                    } else {
-                        showNotification('Системную категорию нельзя редактировать!', true);
-                    }
-                });
+                    };
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = 'Удалить';
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    dropdownMenu.style.display = 'none';
-                    if (!isSystem) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '🗑️ Удалить';
+                    deleteBtn.style.display = 'flex';
+                    deleteBtn.style.alignItems = 'center';
+                    deleteBtn.style.gap = '8px';
+                    deleteBtn.style.width = '100%';
+                    deleteBtn.style.padding = '8px 14px';
+                    deleteBtn.style.background = 'none';
+                    deleteBtn.style.border = 'none';
+                    deleteBtn.style.color = 'var(--text-secondary)';
+                    deleteBtn.style.fontSize = '13px';
+                    deleteBtn.style.cursor = 'pointer';
+                    deleteBtn.style.transition = 'var(--transition)';
+                    deleteBtn.onmouseover = function() { this.style.background = 'rgba(255,107,107,0.1)'; this.style.color = 'var(--danger)'; };
+                    deleteBtn.onmouseout = function() { this.style.background = 'none'; this.style.color = 'var(--text-secondary)'; };
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        dropdownMenu.style.display = 'none';
                         deleteCategory(category.id);
-                    } else {
-                        showNotification('Системную категорию нельзя удалить!', true);
-                    }
-                });
+                    };
 
-                dropdownMenu.appendChild(editBtn);
-                dropdownMenu.appendChild(deleteBtn);
-                btn.appendChild(menuTrigger);
+                    dropdownMenu.appendChild(editBtn);
+                    dropdownMenu.appendChild(deleteBtn);
+                    container.appendChild(dropdownMenu);
+
+                    menuTrigger.onclick = (e) => {
+                        e.stopPropagation();
+                        document.querySelectorAll('.category-dropdown-menu').forEach(menu => {
+                            if (menu !== dropdownMenu) menu.style.display = 'none';
+                        });
+                        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+                    };
+
+                    container.onmouseenter = function() {
+                        if (menuTrigger) menuTrigger.style.opacity = '1';
+                    };
+                    container.onmouseleave = function() {
+                        if (menuTrigger) menuTrigger.style.opacity = '0';
+                    };
+                }
+
+                container.appendChild(colorDot);
                 container.appendChild(btn);
-                container.appendChild(dropdownMenu);
+                container.appendChild(countSpan);
+                if (menuTrigger) container.appendChild(menuTrigger);
 
-                btn.addEventListener('click', function (e) {
-                    if (!menuTrigger.contains(e.target)) {
-                        switchCategory(this.dataset.category);
+                // Клик по контейнеру для переключения категории
+                container.onclick = function(e) {
+                    if (e.target.closest('.category-menu-trigger') || e.target.closest('.category-dropdown-menu')) {
+                        return;
                     }
-                });
+                    // Снимаем активность со всех
+                    document.querySelectorAll('#categorySelector .category-btn-container').forEach(el => {
+                        el.classList.remove('active');
+                    });
+                    container.classList.add('active');
+                    switchCategory(btn.dataset.category);
+                };
+
+                // Если это первая категория или активная
+                if (category.key === document.querySelector('.category-btn.active')?.dataset?.category) {
+                    container.classList.add('active');
+                }
 
                 categorySelector.appendChild(container);
             });
+
+            // Если нет активной категории, активируем первую
+            if (!document.querySelector('#categorySelector .category-btn-container.active') && categories.length > 0) {
+                const firstContainer = categorySelector.querySelector('.category-btn-container');
+                if (firstContainer) {
+                    firstContainer.classList.add('active');
+                    const btn = firstContainer.querySelector('.category-btn');
+                    if (btn) switchCategory(btn.dataset.category);
+                }
+            }
 
             updateCategorySelect();
 
@@ -3960,24 +3312,48 @@
         // Функция открытия модального окна экспорта
         function openExportModal() {
             const container = document.querySelector('.categories-checkbox-container');
+            if (!container) return;
+            
             container.innerHTML = '';
 
             categories.forEach(category => {
                 const item = document.createElement('div');
-                item.className = 'category-checkbox-item';
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.padding = '8px 12px';
+                item.style.marginBottom = '6px';
+                item.style.background = 'rgba(255,255,255,0.03)';
+                item.style.borderRadius = 'var(--radius-sm)';
+                item.style.transition = 'var(--transition)';
+                item.onmouseenter = function() { this.style.background = 'rgba(255,255,255,0.06)'; };
+                item.onmouseleave = function() { this.style.background = 'rgba(255,255,255,0.03)'; };
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = `export-cat-${category.id}`;
                 checkbox.checked = true;
+                checkbox.style.marginRight = '12px';
+                checkbox.style.accentColor = 'var(--primary)';
+                checkbox.style.width = '16px';
+                checkbox.style.height = '16px';
+                checkbox.style.cursor = 'pointer';
 
                 const label = document.createElement('label');
                 label.htmlFor = `export-cat-${category.id}`;
                 label.textContent = category.name;
+                label.style.flex = '1';
+                label.style.cursor = 'pointer';
+                label.style.color = 'var(--text-primary)';
+                label.style.fontSize = '13px';
 
                 const colorPreview = document.createElement('div');
-                colorPreview.className = 'category-color-preview';
+                colorPreview.style.width = '16px';
+                colorPreview.style.height = '16px';
+                colorPreview.style.borderRadius = '50%';
                 colorPreview.style.backgroundColor = category.color;
+                colorPreview.style.border = '1px solid rgba(255,255,255,0.1)';
+                colorPreview.style.flexShrink = '0';
+                colorPreview.style.marginLeft = '8px';
 
                 item.appendChild(checkbox);
                 item.appendChild(label);
@@ -4515,135 +3891,164 @@
         // Показать/скрыть поиск
         function toggleSearchVisibility() {
             const searchContainer = document.getElementById('systemSearchContainer');
-            const searchResults = document.getElementById('searchResults');
+            const searchInput = document.getElementById('systemSearchInput');
+            
+            if (!searchContainer) {
+                console.warn('systemSearchContainer not found');
+                return;
+            }
             
             if (isSystemCategoryActive()) {
                 searchContainer.style.display = 'block';
-                // Скрываем результаты при переключении категории
-                searchResults.style.display = 'none';
-                document.getElementById('systemSearchInput').value = '';
-                document.getElementById('clearSearchBtn').style.display = 'none';
+                // Очищаем поиск при переключении
+                if (searchInput) {
+                    searchInput.value = '';
+                    // Показываем все элементы
+                    const grid = document.getElementById('system-gifsGrid');
+                    if (grid) {
+                        const items = grid.querySelectorAll('.item-container');
+                        items.forEach(item => {
+                            item.style.display = 'grid';
+                        });
+                        const emptyMsg = document.getElementById('searchEmptyMessage');
+                        if (emptyMsg) emptyMsg.style.display = 'none';
+                    }
+                    setTimeout(() => searchInput.focus(), 100);
+                }
+                const clearBtn = document.getElementById('clearSearchBtn');
+                if (clearBtn) {
+                    clearBtn.style.display = 'none';
+                }
             } else {
                 searchContainer.style.display = 'none';
-                searchResults.style.display = 'none';
+                // Сбрасываем фильтр при выходе из системной категории
+                const grid = document.getElementById('system-gifsGrid');
+                if (grid) {
+                    const items = grid.querySelectorAll('.item-container');
+                    items.forEach(item => {
+                        item.style.display = 'grid';
+                    });
+                    const emptyMsg = document.getElementById('searchEmptyMessage');
+                    if (emptyMsg) emptyMsg.style.display = 'none';
+                }
             }
         }
 
-        // Поиск GIF в системной категории
-        async function searchSystemGifs(query) {
-            const resultsContainer = document.getElementById('searchResults');
-            const resultsGrid = document.getElementById('searchResultsGrid');
+        // Поиск GIF в системной категории (фильтрация прямо в категории)
+        function searchSystemGifs(query) {
+            const gridContainer = document.getElementById('system-gifsGrid');
+            if (!gridContainer) {
+                console.warn('System GIFs grid not found');
+                return;
+            }
+            
             const clearBtn = document.getElementById('clearSearchBtn');
+            const searchInput = document.getElementById('systemSearchInput');
             
             query = query.trim().toLowerCase();
             
+            // Если поиск пустой — показываем все элементы
             if (!query) {
-                resultsContainer.style.display = 'none';
-                clearBtn.style.display = 'none';
-                return;
-            }
-            
-            clearBtn.style.display = 'block';
-            
-            const systemItems = itemsData['system_gifs'] || [];
-            const results = systemItems.filter(item => 
-                item.code.toLowerCase().includes(query)
-            );
-            
-            resultsGrid.innerHTML = '';
-            
-            if (results.length === 0) {
-                resultsGrid.innerHTML = `<div class="no-results">😕 Ничего не найдено для "<strong>${query}</strong>"</div>`;
-                resultsContainer.style.display = 'block';
-                return;
-            }
-            
-            resultsContainer.style.display = 'block';
-            
-            const systemItemsFull = itemsData['system_gifs'] || [];
-            
-            for (const item of results) {
-                const gifPath = await ipcRenderer.invoke('get-gif-path', item.gifId);
-                
-                const realIndex = systemItemsFull.findIndex(i => i.gifId === item.gifId);
-                const categoryId = 'system_gifs';
-                
-                const resultElement = document.createElement('div');
-                resultElement.className = 'search-result-item';
-                
-                const code = item.code;
-                const index = code.toLowerCase().indexOf(query);
-                let displayCode = code;
-                if (index !== -1) {
-                    const before = code.substring(0, index);
-                    const match = code.substring(index, index + query.length);
-                    const after = code.substring(index + query.length);
-                    displayCode = `${before}<span style="background: #6c5ce7; color: white; padding: 0 4px; border-radius: 3px;">${match}</span>${after}`;
-                }
-                
-                // Создаем выпадающий список категорий для копирования
-                let dropdownOptions = '';
-                const otherCategories = categories.filter(c => c.id !== categoryId);
-                otherCategories.forEach(c => {
-                    dropdownOptions += `<button onclick="copyItem('${categoryId}', ${realIndex}, '${c.id}')">${c.name}</button>`;
+                // Показываем все карточки
+                const allItems = gridContainer.querySelectorAll('.item-container');
+                allItems.forEach(item => {
+                    item.style.display = 'grid';
                 });
-                
-                resultElement.innerHTML = `
-                    <div class="item-code">
-                        <div class="gif-code-display">
-                            <span>${displayCode}</span>
-                            <div class="search-match">🔍 Найдено в системной категории</div>
-                        </div>
-                    </div>
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                        <div class="gif-container" style="border-color: #6c5ce7;">
-                            <img src="${gifPath || ''}" alt="GIF">
-                        </div>
-                        <div style="display: flex; width: 100%;">
-                            <div class="category-dropdown-container" style="flex: 1;">
-                                <button class="category-dropdown-btn" onclick="toggleCategoryDropdown('copy', '${categoryId}', ${realIndex})" style="background-color: #6c5ce7; padding: 6px 12px; font-size: 12px; min-height: 28px; width: 100%;">
-                                    📋 Копировать в категорию
-                                </button>
-                                <div class="category-dropdown" id="copy-dropdown-${categoryId}-${realIndex}">
-                                    ${dropdownOptions}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                resultsGrid.appendChild(resultElement);
+                if (clearBtn) clearBtn.style.display = 'none';
+                return;
+            }
+            
+            if (clearBtn) clearBtn.style.display = 'block';
+            
+            // Фильтруем карточки
+            const allItems = gridContainer.querySelectorAll('.item-container');
+            let foundCount = 0;
+            
+            allItems.forEach(item => {
+                const codeElement = item.querySelector('.item-code');
+                if (codeElement) {
+                    const code = codeElement.textContent.trim().toLowerCase();
+                    if (code.includes(query)) {
+                        item.style.display = 'grid';
+                        foundCount++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Показываем уведомление, если ничего не найдено
+            const emptyMessage = document.getElementById('searchEmptyMessage');
+            if (foundCount === 0) {
+                if (!emptyMessage) {
+                    const msg = document.createElement('div');
+                    msg.id = 'searchEmptyMessage';
+                    msg.style.cssText = `
+                        grid-column: 1 / -1;
+                        text-align: center;
+                        color: var(--text-muted);
+                        padding: 40px;
+                        font-size: 16px;
+                    `;
+                    msg.innerHTML = `😕 Ничего не найдено для "<strong>${query}</strong>"`;
+                    gridContainer.appendChild(msg);
+                } else {
+                    emptyMessage.style.display = 'block';
+                    emptyMessage.innerHTML = `😕 Ничего не найдено для "<strong>${query}</strong>"`;
+                }
+            } else {
+                if (emptyMessage) {
+                    emptyMessage.style.display = 'none';
+                }
             }
         }
+
+                // Закрытие меню категорий при клике вне
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.category-menu-trigger') && !e.target.closest('.category-dropdown-menu')) {
+                document.querySelectorAll('.category-dropdown-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
+        });
 
         // Обработчик ввода в поиске
         function setupSearch() {
             const searchInput = document.getElementById('systemSearchInput');
             const clearBtn = document.getElementById('clearSearchBtn');
             
-            if (!searchInput) return;
+            if (!searchInput) {
+                console.warn('Search input not found');
+                return;
+            }
             
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     searchSystemGifs(this.value);
-                }, 300);
+                }, 200);
             });
             
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     this.value = '';
-                    document.getElementById('searchResults').style.display = 'none';
-                    clearBtn.style.display = 'none';
+                    searchSystemGifs('');
+                    const clearBtn = document.getElementById('clearSearchBtn');
+                    if (clearBtn) clearBtn.style.display = 'none';
                 }
             });
             
-            clearBtn.addEventListener('click', function() {
-                searchInput.value = '';
-                document.getElementById('searchResults').style.display = 'none';
-                this.style.display = 'none';
-                searchInput.focus();
-            });
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    const searchInput = document.getElementById('systemSearchInput');
+                    if (searchInput) {
+                        searchInput.value = '';
+                        searchSystemGifs('');
+                    }
+                    this.style.display = 'none';
+                    searchInput.focus();
+                });
+            }
         }
 
         // Обновляем функцию switchCategory, чтобы показывать/скрывать поиск
@@ -4746,16 +4151,17 @@
                 console.warn('createStars function not found');
             }
             
-            if (typeof createGlowingLines === 'function') {
-                createGlowingLines();
-            } else {
-                console.warn('createGlowingLines function not found');
-            }
-            
             const initialData = await ipcRenderer.invoke('load-initial-data');
             if (initialData) {
                 categories = initialData.categories || [];
                 itemsData = initialData.itemsData || {};
+
+                // Очищаем названия категорий от 📦
+                categories.forEach(category => {
+                    if (category.name) {
+                        category.name = category.name.replace(/^📦\s*/, '');
+                    }
+                });
                 
                 // ДОБАВЬТЕ ЭТУ ПРОВЕРКУ:
                 console.log('📂 Загруженные категории:', JSON.stringify(categories, null, 2));
@@ -5029,6 +4435,20 @@
 
 
             console.log('📂 Загруженные категории:', categories);
+
+                        // Принудительно показываем/скрываем поиск
+            setTimeout(() => {
+                toggleSearchVisibility();
+                // Обновляем заголовок
+                const activeCategory = document.querySelector('.category-btn.active');
+                if (activeCategory) {
+                    const nameEl = document.getElementById('currentCategoryName');
+                    if (nameEl) {
+                        const cat = categories.find(c => c.key === activeCategory.dataset.category);
+                        if (cat) nameEl.textContent = cat.name;
+                    }
+                }
+            }, 200);
         };
 
                 // Настройка поиска
