@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.6.0",
   "systemGifs": [
     {
       "code": ":ministitch",
@@ -448,6 +448,14 @@
     {
       "code": ":mnmus",
       "gifId": "gif_1784713737959"
+    },
+    {
+      "code": ":minikobra",
+      "gifId": "gif_1784887548764"
+    },
+    {
+      "code": ":minishlep",
+      "gifId": "gif_1784887574383"
     }
   ]
 }
