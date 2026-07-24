@@ -1,5 +1,5 @@
 {
-  "version": "2.6.0",
+  "version": "1.0.0",
   "systemGifs": [
     {
       "code": ":ministitch",
@@ -450,12 +450,28 @@
       "gifId": "gif_1784713737959"
     },
     {
+      "code": ":minishlep",
+      "gifId": "gif_1784887574383"
+    },
+    {
       "code": ":minikobra",
       "gifId": "gif_1784887548764"
     },
     {
-      "code": ":minishlep",
-      "gifId": "gif_1784887574383"
+      "code": ":nikajopa",
+      "gifId": "gif_1784914841549"
+    },
+    {
+      "code": ":nika_chill",
+      "gifId": "gif_1784914927116"
+    },
+    {
+      "code": ":nikabanny",
+      "gifId": "gif_1784914972432"
+    },
+    {
+      "code": ":nikadnc",
+      "gifId": "gif_1784915031620"
     }
   ]
 }
