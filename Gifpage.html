@@ -143,15 +143,15 @@
 
         /* ===== БОКОВАЯ ПАНЕЛЬ ===== */
         .sidebar {
-            width: 220px;
-            min-width: 220px;
+            width: 260px;
+            min-width: 260px;
             background: var(--bg-panel);
             backdrop-filter: blur(20px);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            padding: 16px 0 12px 0;
+            padding: 16px 8px 12px 8px;
             overflow: hidden;
         }
 
@@ -347,7 +347,7 @@
         .sidebar-actions button {
             flex: 1;
             min-width: 0;
-            padding: 8px 4px;
+            padding: 8px 4px;               /* меньше горизонтальных отступов */
             border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
             background: rgba(255, 255, 255, 0.03);
@@ -358,10 +358,11 @@
             transition: var(--transition);
             text-align: center;
             font-family: inherit;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;            /* разрешаем перенос строк */
+            word-break: break-word;         /* чтобы длинные слова тоже переносились */
+            line-height: 1.3;               /* комфортное расстояние между строками */
             letter-spacing: 0.2px;
+            height: auto;                   /* высота подстраивается под содержимое */
         }
 
         .sidebar-actions button:hover {
@@ -1276,6 +1277,61 @@
             color: white;
         }
 
+        .help-content {
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .help-content h2,
+        .help-content h3,
+        .help-content h4 {
+            color: var(--primary-light);
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+        }
+
+        .help-content ul,
+        .help-content ol {
+            padding-left: 1.5em;
+            margin: 0.5em 0;
+        }
+
+        .help-content code {
+            background: rgba(255,255,255,0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #f0c674;
+        }
+
+        .help-content blockquote {
+            border-left: 3px solid var(--primary);
+            padding-left: 12px;
+            margin-left: 0;
+            color: var(--text-secondary);
+        }
+
+        .help-content details {
+            margin: 0.5em 0;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+
+        .help-content details summary {
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--primary-light);
+        }
+
+        .help-content hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 1.5em 0;
+        }
+
     </style>
 </head>
 
@@ -1312,18 +1368,19 @@
             <div class="sidebar-actions">
                 <!-- Первая секция: Добавление -->
                 <div class="sidebar-actions-group" style="display: flex; gap: 4px; width: 100%; flex-wrap: wrap; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color);">
-                    <button id="openAddGifModal" class="action-primary" style="flex: 1;" title="Добавить GIF">Добавить GIF</button>
-                    <button id="openAddCategoryModal" style="flex: 1;" title="Добавить Категорию">Добавить Кат.</button>
+                    <button id="openAddGifModal" class="action-primary" style="flex: 1;" title="Добавить GIF">Добавить<br>GIF</button>
+                    <button id="openAddCategoryModal" style="flex: 1;" title="Добавить категорию">Добавить<br>категорию</button>
                 </div>
                 <!-- Вторая секция: Импорт/Экспорт -->
                 <div class="sidebar-actions-group" style="display: flex; gap: 4px; width: 100%; flex-wrap: wrap; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border-color);">
-                    <button id="importBtn" class="action-success" style="flex: 1;" title="Импорт GIF">Импорт</button>
-                    <button id="exportBtn" class="action-success" style="flex: 1;" title="Экспорт GIF">Экспорт</button>
+                    <button id="importBtn" class="action-success" style="flex: 1;" title="Импорт">Импорт</button>
+                    <button id="exportBtn" class="action-success" style="flex: 1;" title="Экспорт">Экспорт</button>
                 </div>
-                <!-- Третья секция: Обновления -->
+                <!-- Третья секция: Обновления и инструкция -->
                 <div class="sidebar-actions-group" style="display: flex; gap: 4px; width: 100%; flex-wrap: wrap;">
-                    <button id="checkUpdatesBtn" class="action-warning" style="flex: 1;" title="Обновить Приложение">Обновить Пр.</button>
-                    <button id="checkContentBtn" class="action-primary" style="flex: 1;" title="Новые GIF">Новые GIF</button>
+                    <button id="checkUpdatesBtn" class="action-warning" style="flex: 1.1;" title="Обновить приложение">Обновление<br>приложения</button>
+                    <button id="checkContentBtn" class="action-primary" style="flex: 1;" title="Новые GIF">Новые<br>GIF</button>
+                    <button id="openHelpBtn" class="action-primary" style="flex: 1;" title="Открыть инструкцию">Инструкция</button>
                 </div>
             </div>
         </aside>
@@ -1568,6 +1625,208 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" id="gifCloseBtn" style="display: none;" onclick="closeModal('gifDownloadModal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- Модальное окно с инструкцией -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content" style="max-width: 720px; max-height: 90vh;">
+            <div class="modal-header">
+                <h3>📖 Инструкция по использованию miniGIF</h3>
+                <button class="modal-close" onclick="closeModal('helpModal')">✕</button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; max-height: 70vh; padding-right: 8px;">
+                <!-- Содержимое README -->
+                <div class="help-content">
+                    <h2>🧭 Основной интерфейс</h2>
+
+                    <h3>Боковая панель (слева)</h3>
+                    <ul>
+                        <li><strong>Список категорий</strong> – клик по названию открывает её содержимое</li>
+                        <li><strong>⋮ (меню категории)</strong> – редактирование / удаление (только для пользовательских категорий)</li>
+                        <li><strong>«Добавить GIF»</strong> – добавить новый элемент в выбранную категорию</li>
+                        <li><strong>«Добавить Кат.»</strong> – создать новую категорию</li>
+                        <li><strong>«Импорт»</strong> – импортировать данные из ZIP или JSON</li>
+                        <li><strong>«Экспорт»</strong> – экспортировать выбранные категории в ZIP</li>
+                        <li><strong>«Обновить Пр.»</strong> – проверить обновления приложения</li>
+                        <li><strong>«Новые GIF»</strong> – проверить наличие новых системных GIF (из репозитория)</li>
+                    </ul>
+
+                    <h3>Основная область</h3>
+                    <ul>
+                        <li><strong>Поиск</strong> – работает только в системной категории 🔒 (ищет по коду GIF)</li>
+                        <li><strong>Карточка GIF</strong> содержит:
+                            <ul>
+                                <li><strong>Код</strong> (клик – копирование в буфер обмена)</li>
+                                <li><strong>Превью GIF</strong></li>
+                                <li>Кнопки: <strong>Копировать</strong>, <strong>Редактировать</strong> (менять GIF), <strong>Переместить</strong> (в другую категорию), <strong>Удалить</strong></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <hr>
+
+                    <h2>🎯 Ключевые функции</h2>
+
+                    <h3>1. Управление категориями</h3>
+                    <ul>
+                        <li><strong>Создание:</strong> нажмите <strong>«Добавить Кат.»</strong> → укажите название и выберите цвет на цветовом колесе.</li>
+                        <li><strong>Редактирование:</strong> наведите на категорию → нажмите <strong>⋮</strong> → выберите <strong>«Редактировать»</strong>.</li>
+                        <li><strong>Удаление:</strong> наведите на категорию → <strong>⋮</strong> → <strong>«Удалить»</strong>.<br>
+                            <blockquote>⚠️ При удалении категории все её GIF‑файлы удаляются <strong>безвозвратно!</strong></blockquote>
+                        </li>
+                        <li><strong>Системная категория</strong> 🔒 – защищена от изменений, содержит базовый набор GIF (обновляется через кнопку <strong>«Новые GIF»</strong>).</li>
+                    </ul>
+
+                    <h3>2. Добавление GIF</h3>
+                    <ol>
+                        <li>Выберите категорию (или создайте новую).</li>
+                        <li>Нажмите <strong>«Добавить GIF»</strong>.</li>
+                        <li>Введите:
+                            <ul>
+                                <li><strong>Код</strong> – уникальный текст (например, <code>:minipoka</code>)</li>
+                                <li><strong>URL</strong> – прямая ссылка на GIF (поддерживаются <code>.gif</code>, <code>.mp4</code> конвертируются в GIF автоматически)</li>
+                            </ul>
+                        </li>
+                        <li>Нажмите <strong>«Добавить»</strong> – GIF загрузится и появится в категории.</li>
+                    </ol>
+                    <blockquote>💡 <strong>Совет:</strong> Если URL не указать, добавится только код – вы сможете отредактировать GIF позже.</blockquote>
+
+                    <h3>3. GIF Панель (Floating Panel)</h3>
+                    <p>Нажмите <strong>«GIF Панель»</strong> в правом верхнем углу – откроется отдельное мини‑окно с вашей коллекцией.</p>
+                    <ul>
+                        <li><strong>Перетаскивание категорий</strong> – меняйте порядок категорий (drag & drop).</li>
+                        <li><strong>Перетаскивание GIF</strong> – меняйте порядок GIF внутри категории.</li>
+                        <li><strong>Закрепление поверх окон</strong> – кнопка 📌 (панель всегда сверху).</li>
+                        <li><strong>Горячая клавиша</strong> – по умолчанию <code>Ctrl+Shift+G</code> (можно изменить в настройках).</li>
+                    </ul>
+
+                    <h4>Быстрое копирование GIF</h4>
+                    <ul>
+                        <li><strong>Одиночный клик</strong> по GIF – код + пробел копируется в буфер.</li>
+                        <li><strong>Режим множественного копирования:</strong><br>
+                            Зажмите <code>Ctrl</code> (или <code>Cmd</code> на macOS) и кликайте по нужным GIF. При отпускании <code>Ctrl</code> все выбранные коды скопируются одной строкой через пробел.
+                        </li>
+                    </ul>
+
+                    <h3>4. Горячие клавиши и шорткаты</h3>
+                    <ul>
+                        <li><strong>Глобальная горячая клавиша</strong> – открывает/закрывает GIF Панель (по умолчанию <code>Ctrl+Shift+G</code>).</li>
+                        <li><strong>Шорткаты</strong> – привяжите любой GIF к комбинации клавиш, чтобы копировать его мгновенно из любого приложения.</li>
+                    </ul>
+
+                    <h4>Как настроить шорткат</h4>
+                    <ol>
+                        <li>В GIF Панели или в главном окне нажмите кнопку <strong>⚙️ с оранжевой шестерёнкой</strong> (рядом с настройками горячей клавиши).</li>
+                        <li>В открывшемся окне нажмите <strong>«Добавить шорткат»</strong>.</li>
+                        <li>Кликните на любой GIF в коллекции – он будет выбран.</li>
+                        <li>Нажмите желаемую комбинацию клавиш (например, <code>Ctrl+1</code>).</li>
+                        <li>Нажмите <strong>«Сохранить»</strong>.</li>
+                    </ol>
+                    <p>Теперь при нажатии этой комбинации код GIF скопируется в буфер (с пробелом в конце) и появится уведомление.</p>
+
+                    <h3>5. Импорт / Экспорт</h3>
+
+                    <h4>Экспорт</h4>
+                    <ol>
+                        <li>Нажмите <strong>«Экспорт»</strong> на боковой панели.</li>
+                        <li>Отметьте категории, которые хотите выгрузить.</li>
+                        <li>Выберите место сохранения – будет создан ZIP‑архив с <code>data.json</code> и папкой <code>gifs/</code>.</li>
+                    </ol>
+
+                    <h4>Импорт</h4>
+                    <ol>
+                        <li>Нажмите <strong>«Импорт»</strong>.</li>
+                        <li>Выберите ZIP‑архив или JSON‑файл.</li>
+                        <li>Выберите стратегию:
+                            <ul>
+                                <li><strong>Объединить</strong> – добавить новые данные к существующим (дубликаты по коду внутри категорий игнорируются)</li>
+                                <li><strong>Заменить</strong> – полностью перезаписать текущую коллекцию</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <blockquote>⚠️ При импорте GIF‑файлы копируются во внутреннее хранилище приложения.</blockquote>
+
+                    <h3>6. Обновление приложения</h3>
+                    <ul>
+                        <li>Приложение <strong>автоматически проверяет</strong> наличие новых версий при старте.</li>
+                        <li>Вручную – нажмите <strong>«Обновить Пр.»</strong> на боковой панели.</li>
+                        <li>Если обновление доступно, откроется окно с описанием изменений.</li>
+                    </ul>
+
+                    <h3>7. Обновление контента (системных GIF)</h3>
+                    <ul>
+                        <li>Нажмите <strong>«Новые GIF»</strong> – приложение проверит репозиторий на наличие новых GIF для системной категории.</li>
+                        <li>Если найдены новые GIF, появится уведомление с предложением обновить.</li>
+                        <li>Нажмите <strong>«Обновить»</strong> – все новые GIF загрузятся и добавятся в системную категорию.</li>
+                    </ul>
+
+                    <hr>
+
+                    <h2>🔧 Продвинутые возможности</h2>
+
+                    <h3>Редактирование GIF</h3>
+                    <ol>
+                        <li>Нажмите <strong>«Редактировать»</strong> на карточке GIF.</li>
+                        <li>Измените код или URL.</li>
+                        <li>Нажмите <strong>«Сохранить»</strong> – новый GIF загрузится, а старый файл будет заменён.</li>
+                    </ol>
+
+                    <h3>Перемещение между категориями</h3>
+                    <ul>
+                        <li>Нажмите <strong>«Переместить»</strong> → выберите целевую категорию из выпадающего списка.</li>
+                        <li>Элемент переместится (код и файл), исходная запись удалится.</li>
+                    </ul>
+
+                    <blockquote>
+                        <strong>🚫 Ограничения:</strong>
+                        <ul>
+                            <li>Нельзя перемещать элементы <strong>из</strong> системной категории.</li>
+                            <li>Нельзя перемещать элементы <strong>в</strong> системную категорию.</li>
+                            <li>Копирование разрешено <strong>только из системной категории</strong> (нажмите «Выбрать категорию» → копия создаётся в выбранной пользовательской категории).</li>
+                        </ul>
+                    </blockquote>
+
+                    <h3>Поиск в системной категории</h3>
+                    <p>При переключении на системную категорию появляется строка поиска. Введите часть кода – GIF‑карточки отфильтруются в реальном времени.</p>
+
+                    <hr>
+
+                    <h2>❓ Часто задаваемые вопросы</h2>
+
+                    <details>
+                        <summary><strong>Где хранятся мои GIF?</strong></summary>
+                        <p>В папке <code>%APPDATA%/miniGIF/gifs</code> (Windows) или <code>~/Library/Application Support/miniGIF/gifs</code> (macOS).</p>
+                    </details>
+
+                    <details>
+                        <summary><strong>Можно ли использовать свои GIF без интернета?</strong></summary>
+                        <p>Да, все GIF хранятся локально после загрузки.</p>
+                    </details>
+
+                    <details>
+                        <summary><strong>Как изменить глобальную горячую клавишу для панели?</strong></summary>
+                        <p>Нажмите на кнопку с ⚙️ (синяя шестерёнка) в GIF Панели → <strong>«Изменить горячую клавишу»</strong> → нажмите нужную комбинацию → <strong>«Сохранить»</strong>.</p>
+                    </details>
+
+                    <details>
+                        <summary><strong>Почему не работают шорткаты?</strong></summary>
+                        <p>Убедитесь, что комбинация не занята другой программой. В некоторых ОС требуются дополнительные разрешения для глобальных хоткеев.</p>
+                    </details>
+
+                    <details>
+                        <summary><strong>Как удалить системную категорию?</strong></summary>
+                        <p>Нельзя – она защищена. Вы можете скрыть её, просто не переключаясь на неё, или удалить все её GIF через кнопку удаления (с подтверждением).</p>
+                    </details>
+
+                    <hr>
+
+                    <p><em>Источником вдохновения была MiniNika ^_^</em></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('helpModal')">Закрыть</button>
             </div>
         </div>
     </div>
@@ -4242,6 +4501,10 @@
                     closeModal('addCategoryModal');
                 });
             }
+
+            document.getElementById('openHelpBtn').addEventListener('click', function() {
+                openModal('helpModal');
+            });
 
             // ===== ЗАКРЫТИЕ МОДАЛЬНЫХ ОКОН =====
             document.querySelectorAll('.close-modal, .cancel-btn').forEach(btn => {
