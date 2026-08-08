@@ -2,12 +2,12 @@
   "version": "1.0.0",
   "systemGifs": [
     {
-      "code": ":ministitch",
-      "gifId": "gif_1782903562467_sy95imy6d"
-    },
-    {
       "code": ":ministi4",
       "gifId": "gif_1782903562468_g1b5zpg64"
+    },
+    {
+      "code": ":ministitch",
+      "gifId": "gif_1782903562467_sy95imy6d"
     },
     {
       "code": ":miniosu",
@@ -472,6 +472,26 @@
     {
       "code": ":nikadnc",
       "gifId": "gif_1784915031620"
+    },
+    {
+      "code": ":minimeowdance",
+      "gifId": "gif_1786192102447"
+    },
+    {
+      "code": ":minimeowka",
+      "gifId": "gif_1786192190283"
+    },
+    {
+      "code": ":minimeoww",
+      "gifId": "gif_1786192208880"
+    },
+    {
+      "code": ":minipoc",
+      "gifId": "gif_1786192233233"
+    },
+    {
+      "code": ":minishake2",
+      "gifId": "gif_1786192248684"
     }
   ]
 }
