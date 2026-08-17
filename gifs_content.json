@@ -496,6 +496,14 @@
     {
       "code": ":minirock",
       "gifId": "gif_1786987351595"
+    },
+    {
+      "code": ":minirock1x1",
+      "gifId": "gif_1786991856097"
+    },
+    {
+      "code": ":minirock1x2",
+      "gifId": "gif_1786991944545"
     }
   ]
 }
