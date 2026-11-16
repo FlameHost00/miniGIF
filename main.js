@@ -626,6 +626,30 @@ ipcMain.handle('update-gif-url', async (event, { gifId, url }) => {
     }
 });
 
+ipcMain.handle('reset-gif-panel-position', async () => {
+    try {
+        const boundsPath = path.join(app.getPath('userData'), 'gif-panel-bounds.json');
+        if (fs.existsSync(boundsPath)) {
+            fs.unlinkSync(boundsPath);
+        }
+
+        // Если панель сейчас открыта — закрываем её, чтобы при следующем
+        // открытии она создалась уже с чистыми bounds (по центру)
+        if (gifWindow && !gifWindow.isDestroyed()) {
+            gifWindow.destroy();
+            gifWindow = null;
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('gif-panel-state-changed', false);
+            }
+        }
+
+        return true;
+    } catch (err) {
+        console.error('Error resetting gif panel position:', err);
+        return false;
+    }
+});
+
 // ===== ОБРАБОТЧИКИ ДЛЯ ОБНОВЛЕНИЯ КОНТЕНТА =====
 ipcMain.handle('apply-content-update', async () => {
     try {

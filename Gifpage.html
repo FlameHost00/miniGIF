@@ -500,6 +500,8 @@
             flex-shrink: 0;
         }
 
+ 
+
         #toggleGifPanelBtn {
             padding: 8px 18px;
             border: 1px solid rgba(108, 92, 231, 0.3);
@@ -1398,6 +1400,7 @@
 
                 <div class="header-actions">
                     <button id="toggleGifPanelBtn">📌 GIF Панель</button>
+                     <button id="resetGifPanelBtn" title="Сбросить положение панели (если она не открывается)">🔄 Сбросить панель</button>
                 </div>
             </header>
 
@@ -4325,6 +4328,24 @@
                 }
             }, 50);
         };
+
+        document.getElementById('resetGifPanelBtn').addEventListener('click', async () => {
+            document.getElementById('confirmModalTitle').textContent = 'Сбросить панель?';
+            document.getElementById('confirmModalMessage').textContent =
+                'Панель закроется и при следующем открытии появится по центру экрана. Используйте, если панель не открывается.';
+            document.getElementById('confirmModal').classList.add('active');
+
+            document.getElementById('confirmModalYes').onclick = async () => {
+                document.getElementById('confirmModal').classList.remove('active');
+                const success = await ipcRenderer.invoke('reset-gif-panel-position');
+                showNotification(success
+                    ? '✅ Положение панели сброшено. Откройте её заново.'
+                    : '❌ Не удалось сбросить положение', !success);
+            };
+            document.getElementById('confirmModalNo').onclick = () => {
+                document.getElementById('confirmModal').classList.remove('active');
+            };
+        });
 
                 // Горячая клавиша для поиска (Ctrl+F)
         document.addEventListener('keydown', function(e) {
